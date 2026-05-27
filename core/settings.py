@@ -29,6 +29,15 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount', 
     
+    #Installed apps
+    'accounts.apps.AccountsConfig',
+    'bookings.apps.BookingsConfig',
+    'buses.apps.BusesConfig',
+    'dashboard.apps.DashboardConfig',
+    'drivers.apps.DriversConfig',
+    'notifications.apps.NotificationsConfig',
+    'payments.apps.PaymentsConfig',
+    
     #3rd party apps
     "debug_toolbar",
     "crispy_forms",
@@ -54,7 +63,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
-AUTH_USER_MODEL = 'accounts.CustomUser'
 
 TEMPLATES = [
     {
@@ -234,10 +242,6 @@ TIME_ZONE = 'Africa/Harare'
 
 ASGI_APPLICATION = 'core.asgi.application'
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    }
-}
-
-ANTHROPIC_API_KEY = config("ANTHROPIC_API_KEY", default="")
+PAYNOW_INTEGRATION_ID = 'your-id'
+PAYNOW_INTEGRATION_KEY = 'your-key'
+PAYNOW_DOMAIN = 'localhost:8000' if DEBUG else 'yourdomain.com'

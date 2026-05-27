@@ -1,8 +1,7 @@
 from django.db import models
 import uuid
 from django.contrib.contenttypes.models import ContentType
-from simple_history.utils import update_change_reason
-from simple_history.models import HistoricalRecords
+
 
 class BaseModel(models.Model):
     """

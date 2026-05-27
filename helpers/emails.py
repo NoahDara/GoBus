@@ -65,21 +65,9 @@ def send_password_reset_mail(request, user):
     # Build base reset URL
     reset_path = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
     
-    # Add source parameter with organization UID
-    organization_uid = getattr(user, 'organization_uid', None)
+    reset_url = request.build_absolute_uri(reset_path)
     
-    if organization_uid:
-        # Add source parameter to URL
-        reset_url = request.build_absolute_uri(reset_path)
-        separator = '&' if '?' in reset_url else '?'
-        reset_url = f"{reset_url}{separator}source={organization_uid}"
-    else:
-        # Fallback without source (for superusers or users without org)
-        reset_url = request.build_absolute_uri(reset_path)
-        settings.LOGGER.warning(f"User {user.username} has no organization_uid")
-    
-
-    subject = "Password Reset Request - Daarah Tech Enterprise Suite"
+    subject = "Password Reset Request - Go Bus"
     message = render_to_string('mail_list/password_reset.html', {
         'user': user,
         'reset_url': reset_url,
