@@ -1,0 +1,331 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block page_title %}System Analytics{% endblock %}
+{% block page_sub_title %}Overview of GoBus system performance and statistics{% endblock %}
+
+{% block content %}
+
+<!-- KEY METRICS ROW 1 -->
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Total Users</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 class="text-primary">{{ total_users }}</h4>
+                        <p class="text-muted">Active users</p>
+                    </div>
+                    <div style="font-size: 32px; opacity: 0.3;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Total Bookings</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 class="text-success">{{ total_bookings }}</h4>
+                        <p class="text-muted">{{ bookings_today }} today</p>
+                    </div>
+                    <div style="font-size: 32px; opacity: 0.3;">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Total Revenue</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 class="text-warning">${{ total_revenue|floatformat:0 }}</h4>
+                        <p class="text-muted">${{ revenue_today|floatformat:0 }} today</p>
+                    </div>
+                    <div style="font-size: 32px; opacity: 0.3;">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Active Schedules</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 class="text-danger">{{ schedules_active }}</h4>
+                        <p class="text-muted">{{ schedules_today }} scheduled today</p>
+                    </div>
+                    <div style="font-size: 32px; opacity: 0.3;">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OPERATIONAL STATUS -->
+<div class="col-lg-4">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Operational Status</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div class="nk-ck-item">
+                    <h6>Active Drivers</h6>
+                    <div class="text-nowrap">
+                        <span class="badge badge-dim bg-success">{{ total_drivers }}</span>
+                    </div>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Operational Buses</h6>
+                    <div class="text-nowrap">
+                        <span class="badge badge-dim bg-primary">{{ total_buses }}</span>
+                    </div>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Active Routes</h6>
+                    <div class="text-nowrap">
+                        <span class="badge badge-dim bg-info">{{ total_routes }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOOKING STATUS -->
+<div class="col-lg-4">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Booking Status</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div class="nk-ck-item">
+                    <h6>Confirmed</h6>
+                    <div class="text-nowrap">
+                        <span class="badge badge-dim bg-success">{{ bookings_confirmed }}</span>
+                    </div>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Pending</h6>
+                    <div class="text-nowrap">
+                        <span class="badge badge-dim bg-warning">{{ bookings_pending }}</span>
+                    </div>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Pending Revenue</h6>
+                    <div class="text-nowrap">
+                        <span class="badge badge-dim bg-danger">${{ pending_revenue|floatformat:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- REVENUE STATUS -->
+<div class="col-lg-4">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Revenue Status</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div class="nk-ck-item">
+                    <h6>Today's Revenue</h6>
+                    <div class="text-nowrap">
+                        <span class="text-success" style="font-weight: 700; font-size: 16px;">${{ revenue_today|floatformat:0 }}</span>
+                    </div>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Total Revenue</h6>
+                    <div class="text-nowrap">
+                        <span class="text-primary" style="font-weight: 700; font-size: 16px;">${{ total_revenue|floatformat:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RECENT BOOKINGS TABLE -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Recent Bookings</h5>
+            <div class="nk-tools">
+                <a href="{% url 'admin:bookings_booking_changelist' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-tb-list">
+                <div class="nk-tb-item nk-tb-head">
+                    <div class="nk-tb-col"><span>Reference</span></div>
+                    <div class="nk-tb-col"><span>Passenger</span></div>
+                    <div class="nk-tb-col"><span>Route</span></div>
+                    <div class="nk-tb-col"><span>Date</span></div>
+                    <div class="nk-tb-col nk-tb-col-md"><span>Status</span></div>
+                </div>
+                {% for booking in recent_bookings %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="tb-lead"><a href="#">{{ booking.booking_reference }}</a></span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span class="tb-sub">{{ booking.user.get_full_name }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span class="tb-sub">{{ booking.schedule.route.name }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ booking.schedule.departure_time|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="nk-tb-col nk-tb-col-md">
+                        {% if booking.status == 'confirmed' %}
+                        <span class="badge badge-dim bg-success">Confirmed</span>
+                        {% elif booking.status == 'pending' %}
+                        <span class="badge badge-dim bg-warning">Pending</span>
+                        {% else %}
+                        <span class="badge badge-dim bg-danger">Cancelled</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col" colspan="5">
+                        <span class="text-muted">No recent bookings</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RECENT PAYMENTS TABLE -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Recent Payments</h5>
+            <div class="nk-tools">
+                <a href="{% url 'admin:payments_payment_changelist' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-tb-list">
+                <div class="nk-tb-item nk-tb-head">
+                    <div class="nk-tb-col"><span>Reference</span></div>
+                    <div class="nk-tb-col"><span>User</span></div>
+                    <div class="nk-tb-col"><span>Amount</span></div>
+                    <div class="nk-tb-col"><span>Status</span></div>
+                    <div class="nk-tb-col"><span>Date</span></div>
+                </div>
+                {% for payment in recent_payments %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="tb-lead"><a href="#">{{ payment.payment_reference|truncatechars:12 }}</a></span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span class="tb-sub">{{ payment.user.email }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>${{ payment.amount }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        {% if payment.status == 'paid' %}
+                        <span class="badge badge-dim bg-success">Paid</span>
+                        {% elif payment.status == 'pending' %}
+                        <span class="badge badge-dim bg-warning">Pending</span>
+                        {% else %}
+                        <span class="badge badge-dim bg-danger">Failed</span>
+                        {% endif %}
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ payment.created|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="text-muted">No recent payments</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOP ROUTES -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Top Routes</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-tb-list">
+                <div class="nk-tb-item nk-tb-head">
+                    <div class="nk-tb-col"><span>Route</span></div>
+                    <div class="nk-tb-col"><span>Bookings</span></div>
+                    <div class="nk-tb-col"><span>Popularity</span></div>
+                </div>
+                {% for route in top_routes %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="tb-lead">{{ route.name }}</span>
+                        <span class="tb-sub">{{ route.origin }} → {{ route.destination }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ route.booking_count }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <div class="progress" style="height: 6px; width: 100px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ route.booking_count|add:1 }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="text-muted">No routes data available</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

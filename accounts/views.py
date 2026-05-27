@@ -58,7 +58,7 @@ class LoginView(View):
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
             
             # Redirect to next page or dashboard
-            next_page = request.GET.get('next', 'dashboard')
+            next_page = request.GET.get('next', '/dashboard/')
             return redirect(next_page)
         else:
             logger.warning(f"Failed login attempt for: {username_or_email}")

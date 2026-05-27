@@ -631,7 +631,7 @@
         {% endif %}
 
         <!-- Signup Form -->
-        <form method="POST" action="{% url 'accounts:register' %}" id="signupForm" autocomplete="off">
+        <form method="POST" action="{% url 'register' %}" id="signupForm" autocomplete="off">
             {% csrf_token %}
 
             <!-- Name Row -->
@@ -750,7 +750,7 @@
 
         <!-- Footer -->
         <div class="signup-footer">
-            Already have an account? <a href="{% url 'accounts:login' %}">Sign in here</a>
+            Already have an account? <a href="{% url 'login' %}">Sign in here</a>
         </div>
 
     </div>

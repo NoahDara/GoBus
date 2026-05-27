@@ -1,0 +1,303 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block page_title %}My Dashboard{% endblock %}
+{% block page_sub_title %}View your bookings, upcoming trips, and travel history{% endblock %}
+
+{% block content %}
+
+<!-- KEY METRICS ROW -->
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Upcoming Trips</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-primary">{{ upcoming_bookings|length }}</h4>
+                    <p class="text-muted">
+                        {% if upcoming_bookings %}
+                        Next: {{ upcoming_bookings.0.schedule.departure_time|date:"M d" }}
+                        {% else %}
+                        No trips
+                        {% endif %}
+                    </p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Completed Trips</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-success">{{ total_trips }}</h4>
+                    <p class="text-muted">{{ routes_traveled }} routes traveled</p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-history"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Total Spent</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-warning">${{ total_spent|floatformat:0 }}</h4>
+                    <p class="text-muted">${{ spent_this_month|floatformat:0 }} this month</p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Pending Payments</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-danger">${{ pending_payments|floatformat:0 }}</h4>
+                    <p class="text-muted">{{ pending_bookings|length }} bookings awaiting</p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- UPCOMING TRIPS CARDS -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Upcoming Trips</h5>
+            <div class="nk-tools">
+                <a href="{% url 'passenger' %}" class="btn btn-sm btn-primary">Book Another Trip</a>
+            </div>
+        </div>
+        <div class="nk-card-body">
+            {% if upcoming_bookings %}
+            <div style="display: grid; gap: 15px;">
+                {% for booking in upcoming_bookings %}
+                <div style="padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">
+                                {{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}
+                            </div>
+                            <div style="font-size: 12px; color: #666;">
+                                <i class="fas fa-map-pin"></i>
+                                {{ booking.schedule.route.name }}
+                            </div>
+                        </div>
+                        <span class="badge badge-dim bg-success">Confirmed</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 12px 0; padding: 12px 0; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;">
+                        <div>
+                            <div style="font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                Departure
+                            </div>
+                            <div style="font-size: 14px; font-weight: 700;">
+                                {{ booking.schedule.departure_time|date:"M d, H:i" }}
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                Seat
+                            </div>
+                            <div style="font-size: 14px; font-weight: 700;">
+                                {{ booking.seat.seat_number }}
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                Reference
+                            </div>
+                            <div style="font-size: 14px; font-weight: 700; color: #667eea;">
+                                {{ booking.booking_reference }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 12px; color: #666;">
+                                From: {{ booking.boarding_stop.name }}
+                            </div>
+                            <div style="font-size: 12px; color: #666;">
+                                To: {{ booking.alighting_stop.name }}
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-primary">View Details</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 50px 20px; color: #999;">
+                <i class="fas fa-calendar-times" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
+                <p style="margin-bottom: 15px;">No upcoming trips</p>
+                <a href="#" class="btn btn-primary">Book Your First Trip Now</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- PENDING PAYMENTS ALERT -->
+{% if pending_bookings %}
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Pending Payments</h5>
+            <span style="color: #d63031; font-weight: 600;">{{ pending_bookings|length }} awaiting payment</span>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: grid; gap: 12px;">
+                {% for booking in pending_bookings %}
+                <div style="padding: 12px; background: rgba(255, 107, 107, 0.05); border: 1px solid rgba(255, 107, 107, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">
+                            {{ booking.schedule.route.name }}
+                        </div>
+                        <div style="font-size: 12px; color: #666;">
+                            {{ booking.schedule.departure_time|date:"M d, Y H:i" }}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: #d63031; margin-bottom: 6px;">
+                            ${{ booking.fare|floatformat:0 }}
+                        </div>
+                        <button class="btn btn-sm btn-danger">Complete Payment</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- TRAVEL HISTORY -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Travel History</h5>
+            <div class="nk-tools">
+                <a href="#" class="btn btn-sm btn-primary">View All</a>
+            </div>
+        </div>
+        <div class="nk-card-body">
+            {% if past_bookings %}
+            <div class="nk-tb-list">
+                <div class="nk-tb-item nk-tb-head">
+                    <div class="nk-tb-col"><span>Route</span></div>
+                    <div class="nk-tb-col"><span>Date</span></div>
+                    <div class="nk-tb-col"><span>Seat</span></div>
+                    <div class="nk-tb-col"><span>Price</span></div>
+                    <div class="nk-tb-col"><span>Status</span></div>
+                </div>
+                {% for booking in past_bookings %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="tb-lead">{{ booking.schedule.route.name }}</span>
+                        <span class="tb-sub">{{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ booking.schedule.departure_time|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span><strong>{{ booking.seat.seat_number }}</strong></span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>${{ booking.fare|floatformat:0 }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span class="badge badge-dim bg-secondary">Completed</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 50px 20px; color: #999;">
+                <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
+                <p>No completed trips yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="col-lg-6">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Booking Statistics</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div class="nk-ck-item">
+                    <h6>Confirmed Bookings</h6>
+                    <span class="badge badge-dim bg-success">{{ confirmed_bookings }}</span>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Pending Bookings</h6>
+                    <span class="badge badge-dim bg-warning">{{ pending_bookings|length }}</span>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Total Bookings</h6>
+                    <span class="badge badge-dim bg-primary">{{ total_bookings }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-6">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Spending This Month</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 32px; font-weight: 700; color: #667eea; margin-bottom: 8px;">
+                    ${{ spent_this_month|floatformat:0 }}
+                </div>
+                <div style="background: #f0f0f0; border-radius: 8px; height: 8px; margin: 15px 0; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 65%;"></div>
+                </div>
+                <div style="font-size: 12px; color: #666;">
+                    Budget: $200 remaining
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Driver Dashboard{% endblock %}
+
+{% block page_title %}Driver Dashboard{% endblock %}
+{% block page_sub_title %}Manage your bus and today's trips{% endblock %}
+
+{% block content %}
+
+<!-- KEY METRICS ROW -->
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Total Earnings</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-primary">${{ total_earnings|floatformat:0 }}</h4>
+                    <p class="text-muted">${{ earnings_today|floatformat:0 }} today</p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Trips This Month</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-success">{{ trips_this_month }}</h4>
+                    <p class="text-muted">{{ schedules_today }} today</p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-route"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Month Earnings</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-warning">${{ earnings_month|floatformat:0 }}</h4>
+                    <p class="text-muted">Avg per trip: ${% if trips_this_month %}{{ earnings_month|add:1|floatformat:0 }}{% else %}0{% endif %}</p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-xl-3">
+    <div class="nk-card is-dark">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Active Trips</h5>
+        </div>
+        <div class="nk-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 class="text-danger">{{ schedules_active }}</h4>
+                    <p class="text-muted">
+                        {% if upcoming_schedules %}
+                        Next: {{ upcoming_schedules.0.departure_time|date:"H:i" }}
+                        {% else %}
+                        No upcoming
+                        {% endif %}
+                    </p>
+                </div>
+                <div style="font-size: 32px; opacity: 0.3;">
+                    <i class="fas fa-bus"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ASSIGNED BUS -->
+{% if current_bus %}
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Assigned Bus</h5>
+        </div>
+        <div class="nk-card-body">
+            <div class="nk-ck-list">
+                <div class="nk-ck-item">
+                    <h6>Bus Number</h6>
+                    <span class="text-primary" style="font-weight: 700;">{{ current_bus.bus_number }}</span>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Plate Number</h6>
+                    <span class="text-primary" style="font-weight: 700;">{{ current_bus.plate_number }}</span>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Capacity</h6>
+                    <span class="text-primary" style="font-weight: 700;">{{ current_bus.capacity }} Seats</span>
+                </div>
+                <div class="nk-ck-item">
+                    <h6>Status</h6>
+                    {% if current_bus.is_operational %}
+                    <span class="badge badge-dim bg-success">Operational</span>
+                    {% else %}
+                    <span class="badge badge-dim bg-danger">Maintenance</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- TODAY'S SCHEDULE -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Today's Schedule</h5>
+            <div class="nk-tools">
+                <span class="badge badge-dim bg-info">{{ today_schedules|length }} trips</span>
+            </div>
+        </div>
+        <div class="nk-card-body">
+            {% if today_schedules %}
+            <div class="nk-tb-list">
+                <div class="nk-tb-item nk-tb-head">
+                    <div class="nk-tb-col"><span>Route</span></div>
+                    <div class="nk-tb-col"><span>Departure</span></div>
+                    <div class="nk-tb-col"><span>Arrival</span></div>
+                    <div class="nk-tb-col"><span>Passengers</span></div>
+                    <div class="nk-tb-col"><span>Status</span></div>
+                </div>
+                {% for schedule in today_schedules %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span class="tb-lead">{{ schedule.route.name }}</span>
+                        <span class="tb-sub">{{ schedule.route.origin }} → {{ schedule.route.destination }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ schedule.departure_time|date:"H:i" }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ schedule.arrival_time|date:"H:i" }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span><strong>{{ schedule.bookings|length }}</strong> / {{ schedule.bus.capacity }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        {% if schedule.status == 'scheduled' %}
+                        <span class="badge badge-dim bg-info">Scheduled</span>
+                        {% elif schedule.status == 'in_progress' %}
+                        <span class="badge badge-dim bg-success">In Progress</span>
+                        {% elif schedule.status == 'completed' %}
+                        <span class="badge badge-dim bg-secondary">Completed</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 50px 20px; color: #999;">
+                <i class="fas fa-calendar-times" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
+                <p>No trips scheduled for today</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- UPCOMING TRIPS -->
+<div class="col-12">
+    <div class="nk-card">
+        <div class="nk-card-head">
+            <h5 class="nk-card-title">Upcoming Trips (Next 7 Days)</h5>
+        </div>
+        <div class="nk-card-body">
+            {% if upcoming_schedules %}
+            <div class="nk-tb-list">
+                <div class="nk-tb-item nk-tb-head">
+                    <div class="nk-tb-col"><span>Date</span></div>
+                    <div class="nk-tb-col"><span>Route</span></div>
+                    <div class="nk-tb-col"><span>Departure</span></div>
+                    <div class="nk-tb-col"><span>Passengers</span></div>
+                </div>
+                {% for schedule in upcoming_schedules %}
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col">
+                        <span>{{ schedule.departure_time|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span class="tb-lead">{{ schedule.route.name }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>{{ schedule.departure_time|date:"H:i" }}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span><strong>{{ schedule.bookings|length }}</strong> / {{ schedule.bus.capacity }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 50px 20px; color: #999;">
+                <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
+                <p>No upcoming trips</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
