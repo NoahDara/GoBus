@@ -58,7 +58,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware', 
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -150,11 +149,19 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+ 
+# ============================================================================
+# AUTHENTICATION BACKENDS (if using django-allauth)
+# ============================================================================
+ 
 AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-    'accounts.auth_backends.EmailOrUsernameModelBackend',
+    
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
 
 LOGIN_REDIRECT_URL = 'dashboard'
 ACCOUNT_LOGOUT_REDIRECT = "login"
@@ -245,3 +252,66 @@ ASGI_APPLICATION = 'core.asgi.application'
 PAYNOW_INTEGRATION_ID = 'your-id'
 PAYNOW_INTEGRATION_KEY = 'your-key'
 PAYNOW_DOMAIN = 'localhost:8000' if DEBUG else 'yourdomain.com'
+
+# ============================================================================
+# GOOGLE OAUTH CONFIGURATION
+# ============================================================================
+ 
+# Google OAuth 2.0 Credentials
+# Get these from Google Cloud Console: https://console.cloud.google.com
+GOOGLE_OAUTH_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
+GOOGLE_OAUTH_CLIENT_SECRET = 'YOUR_GOOGLE_CLIENT_SECRET'
+ 
+# Google OAuth Redirect URI (must match Google Console configuration)
+# For local development:
+# GOOGLE_OAUTH_REDIRECT_URI = 'http://localhost:8000/accounts/google/callback/'
+# For production:
+# GOOGLE_OAUTH_REDIRECT_URI = 'https://yourdomain.com/accounts/google/callback/'
+ 
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv(
+    'GOOGLE_OAUTH_REDIRECT_URI',
+    'http://localhost:8000/accounts/google/callback/'
+)
+ 
+ 
+# ============================================================================
+# DJANGO-ALLAUTH SETTINGS (Optional - makes OAuth easier)
+# ============================================================================
+ 
+# Auto-login after social auth
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ 
+# Google Provider Settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': GOOGLE_OAUTH_CLIENT_ID,
+            'secret': GOOGLE_OAUTH_CLIENT_SECRET,
+            'key': ''
+        }
+    }
+}
+ 
+# ============================================================================
+# ALTERNATIVE: MANUAL GOOGLE OAUTH (without django-allauth)
+# ============================================================================
+# Use the GoogleAuthService from accounts/services.py
+ 
+# Requires: pip install google-auth
+
+# ============================================================================
+# CORS CONFIGURATION (for AJAX requests from frontend)
+# ============================================================================
+ 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://yourdomain.com',
+]

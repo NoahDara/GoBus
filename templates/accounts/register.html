@@ -1,0 +1,833 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - GoBus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #1ee0ac;
+            --warning: #ffb703;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --text: #2d3748;
+            --muted: #718096;
+            --border: #e2e8f0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: var(--light-bg);
+            color: var(--text);
+        }
+
+        .register-page {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+            gap: 0;
+        }
+
+        /* ════════════════════════════════════════════════════════════════ */
+        /* LEFT PANEL: ONBOARDING JOURNEY */
+        /* ════════════════════════════════════════════════════════════════ */
+
+        .journey-panel {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .journey-panel::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -100px;
+            left: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .journey-panel::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            bottom: -50px;
+            right: -50px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+
+        .journey-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .journey-title {
+            color: var(--white);
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .journey-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin-bottom: 50px;
+        }
+
+        /* Benefits list */
+        .benefits-list {
+            text-align: left;
+            max-width: 340px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            animation: slideInLeft 0.6s ease both;
+        }
+
+        .benefit-item:nth-child(1) { animation-delay: 0.1s; }
+        .benefit-item:nth-child(2) { animation-delay: 0.2s; }
+        .benefit-item:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .benefit-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .benefit-text {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .benefit-text strong {
+            display: block;
+            color: var(--white);
+            margin-bottom: 2px;
+        }
+
+        /* ════════════════════════════════════════════════════════════════ */
+        /* RIGHT PANEL: SIGNUP FORM */
+        /* ════════════════════════════════════════════════════════════════ */
+
+        .signup-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 50px;
+            background: var(--white);
+            overflow-y: auto;
+        }
+
+        .signup-header {
+            margin-bottom: 35px;
+        }
+
+        .signup-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .signup-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .signup-subtitle {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 25px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-danger {
+            background: #fee;
+            border-color: #f093fb;
+            color: #d63031;
+        }
+
+        .alert-success {
+            background: #efe;
+            border-color: #1ee0ac;
+            color: #27ae60;
+        }
+
+        /* Form fields */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+            transition: all 0.3s ease;
+            background: var(--light-bg);
+        }
+
+        .form-input::placeholder {
+            color: var(--muted);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            font-size: 11px;
+            padding: 5px 8px;
+            border-radius: 5px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .password-strength.weak {
+            background: rgba(208, 48, 49, 0.1);
+            color: #d63031;
+            display: block;
+        }
+
+        .password-strength.medium {
+            background: rgba(255, 183, 3, 0.1);
+            color: #e67e22;
+            display: block;
+        }
+
+        .password-strength.strong {
+            background: rgba(30, 224, 172, 0.1);
+            color: #1ee0ac;
+            display: block;
+        }
+
+        /* Terms checkbox */
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: var(--light-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .terms-checkbox input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .terms-checkbox label {
+            margin: 0;
+            font-size: 12px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .terms-checkbox a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .terms-checkbox a:hover {
+            opacity: 0.7;
+        }
+
+        /* Submit button */
+        .btn-signup {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .btn-signup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-signup:hover::before {
+            left: 100%;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-signup:active {
+            transform: translateY(0);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Google signup */
+        .google-signup {
+            margin-bottom: 20px;
+        }
+
+        .google-signup button {
+            width: 100%;
+            padding: 12px;
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+        }
+
+        .google-signup button:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.15);
+        }
+
+        .google-signup img {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Footer */
+        .signup-footer {
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .signup-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .signup-footer a:hover {
+            opacity: 0.7;
+        }
+
+        /* ════════════════════════════════════════════════════════════════ */
+        /* RESPONSIVE */
+        /* ════════════════════════════════════════════════════════════════ */
+
+        @media (max-width: 1024px) {
+            .register-page {
+                grid-template-columns: 1fr;
+            }
+
+            .journey-panel {
+                display: none;
+            }
+
+            .signup-panel {
+                padding: 40px 30px;
+                min-height: 100vh;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .signup-panel {
+                padding: 30px 20px;
+            }
+
+            .signup-title {
+                font-size: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-label {
+                font-size: 12px;
+            }
+
+            .form-input {
+                padding: 12px 14px;
+            }
+        }
+
+        /* Form animations */
+        .signup-header,
+        .form-group,
+        .btn-signup,
+        .divider,
+        .google-signup,
+        .signup-footer {
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .signup-header { animation-delay: 0.1s; }
+        .form-group:nth-child(1) { animation-delay: 0.2s; }
+        .form-group:nth-child(2) { animation-delay: 0.25s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .btn-signup { animation-delay: 0.4s; }
+        .divider { animation-delay: 0.45s; }
+        .google-signup { animation-delay: 0.5s; }
+        .signup-footer { animation-delay: 0.55s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-page">
+
+    <!-- LEFT: ONBOARDING JOURNEY -->
+    <div class="journey-panel">
+        <div class="journey-content">
+            <h1 class="journey-title">Join GoBus Today</h1>
+            <p class="journey-subtitle">Start your journey to convenient bus booking</p>
+
+            <!-- Benefits -->
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <strong>Quick Booking</strong>
+                        <span>Book in seconds</span>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <strong>Secure Payment</strong>
+                        <span>100% safe transactions</span>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <strong>24/7 Support</strong>
+                        <span>We're always here to help</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: SIGNUP FORM -->
+    <div class="signup-panel">
+
+        <!-- Header -->
+        <div class="signup-header">
+            <div class="signup-logo">
+                <div class="logo-icon">🚌</div>
+                <span class="logo-text">GoBus</span>
+            </div>
+            <h2 class="signup-title">Create Account</h2>
+            <p class="signup-subtitle">Join our community and start booking today</p>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Signup Form -->
+        <form method="POST" action="{% url 'accounts:register' %}" id="signupForm" autocomplete="off">
+            {% csrf_token %}
+
+            <!-- Name Row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> First Name
+                    </label>
+                    <input
+                        type="text"
+                        name="first_name"
+                        class="form-input"
+                        placeholder="First name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> Last Name
+                    </label>
+                    <input
+                        type="text"
+                        name="last_name"
+                        class="form-input"
+                        placeholder="Last name"
+                        required
+                    >
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-envelope"></i> Email Address
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    class="form-input"
+                    placeholder="your.email@example.com"
+                    required
+                >
+            </div>
+
+            <!-- Username -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-at"></i> Username
+                </label>
+                <input
+                    type="text"
+                    name="username"
+                    class="form-input"
+                    placeholder="Choose a username"
+                    required
+                >
+            </div>
+
+            <!-- Password Row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="At least 8 characters"
+                        required
+                        onchange="checkPasswordStrength()"
+                    >
+                    <div id="strength" class="password-strength"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Confirm
+                    </label>
+                    <input
+                        type="password"
+                        name="password_confirm"
+                        class="form-input"
+                        placeholder="Confirm password"
+                        required
+                    >
+                </div>
+            </div>
+
+            <!-- Terms -->
+            <div class="terms-checkbox">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">
+                    I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>
+                </label>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-signup">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider">Or sign up with</div>
+
+        <!-- Google Signup -->
+        <div class="google-signup">
+            <button type="button" onclick="redirectToGoogleSignup()">
+                <img src="https://www.google.com/favicon.ico" alt="Google">
+                Sign up with Google
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="signup-footer">
+            Already have an account? <a href="{% url 'accounts:login' %}">Sign in here</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Password strength check
+    function checkPasswordStrength() {
+        const password = document.getElementById('password').value;
+        const strengthDiv = document.getElementById('strength');
+
+        if (password.length === 0) {
+            strengthDiv.innerHTML = '';
+            strengthDiv.classList.remove('weak', 'medium', 'strong');
+            return;
+        }
+
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (password.length >= 12) strength++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+        if (strength <= 2) {
+            strengthDiv.className = 'password-strength weak';
+            strengthDiv.innerHTML = '⚠️ Weak password';
+        } else if (strength <= 3) {
+            strengthDiv.className = 'password-strength medium';
+            strengthDiv.innerHTML = '📊 Medium strength';
+        } else {
+            strengthDiv.className = 'password-strength strong';
+            strengthDiv.innerHTML = '✅ Strong password';
+        }
+    }
+
+    // Google signup
+    function redirectToGoogleSignup() {
+        const clientId = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        const redirectUri = window.location.origin + '/accounts/google/callback/';
+        const scope = 'openid email profile';
+
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+            `client_id=${clientId}&` +
+            `redirect_uri=${redirectUri}&` +
+            `response_type=code&` +
+            `scope=${scope}&` +
+            `prompt=consent`;
+
+        window.location.href = authUrl;
+    }
+
+    // Form validation
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        const password = document.querySelector('input[name="password"]').value;
+        const passwordConfirm = document.querySelector('input[name="password_confirm"]').value;
+
+        if (password !== passwordConfirm) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            return false;
+        }
+
+        if (password.length < 8) {
+            e.preventDefault();
+            alert('Password must be at least 8 characters!');
+            return false;
+        }
+
+        if (!document.getElementById('terms').checked) {
+            e.preventDefault();
+            alert('You must agree to the terms and privacy policy!');
+            return false;
+        }
+    });
+</script>
+
+</body>
+</html>
