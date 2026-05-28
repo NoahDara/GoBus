@@ -377,7 +377,7 @@ class PassengerDashboardView(TemplateView):
             'schedule__route__origin',
             'schedule__route__destination'
         ).annotate(
-            count=Count('id')
+            count=Count('uid')
         ).order_by('-count')[:5]
         context['frequent_routes'] = frequent_routes
         

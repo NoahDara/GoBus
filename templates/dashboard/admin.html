@@ -4,327 +4,491 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block page_title %}System Analytics{% endblock %}
-{% block page_sub_title %}Overview of GoBus system performance and statistics{% endblock %}
+{% block page_sub_title %}Overview of GoBus system performance{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="#" class="btn btn-white btn-dim btn-outline-primary">
+        <em class="icon ni ni-download-cloud"></em>
+        <span>Export</span>
+    </a>
+</li>
+<li>
+    <a href="{% url 'admin:index' %}" class="btn btn-primary">
+        <em class="icon ni ni-cog"></em>
+        <span>Admin Panel</span>
+    </a>
+</li>
+{% endblock %}
 
 {% block content %}
 
-<!-- KEY METRICS ROW 1 -->
-<div class="col-md-6 col-xl-3">
-    <div class="nk-card is-dark">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Total Users</h5>
-        </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 class="text-primary">{{ total_users }}</h4>
-                        <p class="text-muted">Active users</p>
-                    </div>
-                    <div style="font-size: 32px; opacity: 0.3;">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-            </div>
+<style>
+    /* ── STAT CARDS ── */
+    .stat-card {
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .stat-card.blue  { background: #e8ecff; border: 1px solid #b8c4ff; }
+    .stat-card.green { background: #e2f8f2; border: 1px solid #9fe8d4; }
+    .stat-card.amber { background: #fef3d8; border: 1px solid #fad383; }
+    .stat-card.red   { background: #fde8e8; border: 1px solid #f9b8b8; }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+        color: #fff;
+    }
+
+    .stat-card.blue  .stat-icon { background: #6576ff; }
+    .stat-card.green .stat-icon { background: #1ee0ac; }
+    .stat-card.amber .stat-icon { background: #f4bd0e; }
+    .stat-card.red   .stat-icon { background: #e85347; }
+
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 3px;
+    }
+
+    .stat-card.blue  .stat-label { color: #4050b5; }
+    .stat-card.green .stat-label { color: #0d7a60; }
+    .stat-card.amber .stat-label { color: #8a6200; }
+    .stat-card.red   .stat-label { color: #a33030; }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 3px;
+    }
+
+    .stat-card.blue  .stat-value { color: #2d3aaa; }
+    .stat-card.green .stat-value { color: #0a5e49; }
+    .stat-card.amber .stat-value { color: #6b4a00; }
+    .stat-card.red   .stat-value { color: #7e2424; }
+
+    .stat-sub { font-size: 12px; }
+
+    .stat-card.blue  .stat-sub { color: #5060cc; }
+    .stat-card.green .stat-sub { color: #0d7a60; }
+    .stat-card.amber .stat-sub { color: #8a6200; }
+    .stat-card.red   .stat-sub { color: #a33030; }
+
+    /* ── SECTION CARD ── */
+    .nk-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 22px 24px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #364a63;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-header h3 em { font-size: 18px; color: #6576ff; }
+
+    /* ── STATS GRID ── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .stat-item {
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border-left: 2px solid #6576ff;
+    }
+
+    .stat-item-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #8094ae;
+        margin-bottom: 4px;
+    }
+
+    .stat-item-val {
+        font-size: 18px;
+        font-weight: 700;
+        color: #364a63;
+    }
+
+    /* ── TABLE ── */
+    .data-table { width: 100%; border-collapse: collapse; }
+
+    .data-table thead tr {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .data-table th {
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #8094ae;
+    }
+
+    .data-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 13px;
+        color: #364a63;
+    }
+
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover { background: #f8fafc; }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-success {
+        background: #e2f8f2;
+        color: #0a5e49;
+    }
+
+    .badge-warning {
+        background: #fef3d8;
+        color: #8a6200;
+    }
+
+    .badge-danger {
+        background: #fde8e8;
+        color: #a33030;
+    }
+
+    .badge-info {
+        background: #e8ecff;
+        color: #2d3aaa;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #8094ae;
+    }
+
+    .empty-state em {
+        font-size: 38px;
+        display: block;
+        margin-bottom: 10px;
+        opacity: .35;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        font-weight: 700;
+        color: #364a63;
+        margin: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+{# ── STAT CARDS ── #}
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card blue">
+        <div class="stat-icon"><em class="icon ni ni-users"></em></div>
+        <div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-sub">All registered users</div>
         </div>
     </div>
 </div>
 
-<div class="col-md-6 col-xl-3">
-    <div class="nk-card is-dark">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Total Bookings</h5>
-        </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 class="text-success">{{ total_bookings }}</h4>
-                        <p class="text-muted">{{ bookings_today }} today</p>
-                    </div>
-                    <div style="font-size: 32px; opacity: 0.3;">
-                        <i class="fas fa-ticket-alt"></i>
-                    </div>
-                </div>
-            </div>
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card green">
+        <div class="stat-icon"><em class="icon ni ni-ticket-alt"></em></div>
+        <div>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value">{{ total_bookings }}</div>
+            <div class="stat-sub">{{ bookings_today }} today</div>
         </div>
     </div>
 </div>
 
-<div class="col-md-6 col-xl-3">
-    <div class="nk-card is-dark">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Total Revenue</h5>
-        </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 class="text-warning">${{ total_revenue|floatformat:0 }}</h4>
-                        <p class="text-muted">${{ revenue_today|floatformat:0 }} today</p>
-                    </div>
-                    <div style="font-size: 32px; opacity: 0.3;">
-                        <i class="fas fa-credit-card"></i>
-                    </div>
-                </div>
-            </div>
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card amber">
+        <div class="stat-icon"><em class="icon ni ni-wallet"></em></div>
+        <div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value">${{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-sub">${{ revenue_today|floatformat:0 }} today</div>
         </div>
     </div>
 </div>
 
-<div class="col-md-6 col-xl-3">
-    <div class="nk-card is-dark">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Active Schedules</h5>
-        </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 class="text-danger">{{ schedules_active }}</h4>
-                        <p class="text-muted">{{ schedules_today }} scheduled today</p>
-                    </div>
-                    <div style="font-size: 32px; opacity: 0.3;">
-                        <i class="fas fa-bus"></i>
-                    </div>
-                </div>
-            </div>
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card red">
+        <div class="stat-icon"><em class="icon ni ni-bus"></em></div>
+        <div>
+            <div class="stat-label">Active Schedules</div>
+            <div class="stat-value">{{ schedules_active }}</div>
+            <div class="stat-sub">{{ schedules_today }} today</div>
         </div>
     </div>
 </div>
 
-<!-- OPERATIONAL STATUS -->
-<div class="col-lg-4">
+{# ── OPERATIONAL STATUS + BOOKING STATUS ── #}
+<div class="col-lg-6">
     <div class="nk-card">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Operational Status</h5>
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-server"></em>
+                Operational Status
+            </h3>
         </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div class="nk-ck-item">
-                    <h6>Active Drivers</h6>
-                    <div class="text-nowrap">
-                        <span class="badge badge-dim bg-success">{{ total_drivers }}</span>
-                    </div>
-                </div>
-                <div class="nk-ck-item">
-                    <h6>Operational Buses</h6>
-                    <div class="text-nowrap">
-                        <span class="badge badge-dim bg-primary">{{ total_buses }}</span>
-                    </div>
-                </div>
-                <div class="nk-ck-item">
-                    <h6>Active Routes</h6>
-                    <div class="text-nowrap">
-                        <span class="badge badge-dim bg-info">{{ total_routes }}</span>
-                    </div>
-                </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-item-label">Active Drivers</div>
+                <div class="stat-item-val" style="color:#0a5e49;">{{ total_drivers }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-label">Operational Buses</div>
+                <div class="stat-item-val" style="color:#2d3aaa;">{{ total_buses }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-label">Total Routes</div>
+                <div class="stat-item-val" style="color:#8a6200;">{{ total_routes }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-label">Total Schedules</div>
+                <div class="stat-item-val" style="color:#a33030;">{{ total_schedules }}</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- BOOKING STATUS -->
-<div class="col-lg-4">
+<div class="col-lg-6">
     <div class="nk-card">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Booking Status</h5>
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-chart-bar"></em>
+                Booking Status
+            </h3>
         </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div class="nk-ck-item">
-                    <h6>Confirmed</h6>
-                    <div class="text-nowrap">
-                        <span class="badge badge-dim bg-success">{{ bookings_confirmed }}</span>
-                    </div>
-                </div>
-                <div class="nk-ck-item">
-                    <h6>Pending</h6>
-                    <div class="text-nowrap">
-                        <span class="badge badge-dim bg-warning">{{ bookings_pending }}</span>
-                    </div>
-                </div>
-                <div class="nk-ck-item">
-                    <h6>Pending Revenue</h6>
-                    <div class="text-nowrap">
-                        <span class="badge badge-dim bg-danger">${{ pending_revenue|floatformat:0 }}</span>
-                    </div>
-                </div>
+
+        <div class="stats-grid">
+            <div class="stat-item" style="border-left-color: #1ee0ac;">
+                <div class="stat-item-label">Confirmed</div>
+                <div class="stat-item-val" style="color:#0a5e49;">{{ bookings_confirmed }}</div>
+            </div>
+            <div class="stat-item" style="border-left-color: #f4bd0e;">
+                <div class="stat-item-label">Pending</div>
+                <div class="stat-item-val" style="color:#8a6200;">{{ bookings_pending }}</div>
+            </div>
+            <div class="stat-item" style="border-left-color: #6576ff;">
+                <div class="stat-item-label">Total Revenue</div>
+                <div class="stat-item-val" style="color:#2d3aaa;">${{ total_revenue|floatformat:0 }}</div>
+            </div>
+            <div class="stat-item" style="border-left-color: #e85347;">
+                <div class="stat-item-label">Pending Revenue</div>
+                <div class="stat-item-val" style="color:#a33030;">${{ pending_revenue|floatformat:0 }}</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- REVENUE STATUS -->
-<div class="col-lg-4">
-    <div class="nk-card">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Revenue Status</h5>
-        </div>
-        <div class="nk-card-body">
-            <div class="nk-ck-list">
-                <div class="nk-ck-item">
-                    <h6>Today's Revenue</h6>
-                    <div class="text-nowrap">
-                        <span class="text-success" style="font-weight: 700; font-size: 16px;">${{ revenue_today|floatformat:0 }}</span>
-                    </div>
-                </div>
-                <div class="nk-ck-item">
-                    <h6>Total Revenue</h6>
-                    <div class="text-nowrap">
-                        <span class="text-primary" style="font-weight: 700; font-size: 16px;">${{ total_revenue|floatformat:0 }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- RECENT BOOKINGS TABLE -->
+{# ── RECENT BOOKINGS ── #}
 <div class="col-12">
     <div class="nk-card">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Recent Bookings</h5>
-            <div class="nk-tools">
-                <a href="{% url 'admin:bookings_booking_changelist' %}" class="btn btn-sm btn-primary">View All</a>
-            </div>
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-ticket-alt"></em>
+                Recent Bookings
+            </h3>
+            <a href="{% url 'admin:bookings_booking_changelist' %}" class="btn btn-sm btn-primary">
+                <em class="icon ni ni-arrow-right"></em>
+                <span>View All</span>
+            </a>
         </div>
-        <div class="nk-card-body">
-            <div class="nk-tb-list">
-                <div class="nk-tb-item nk-tb-head">
-                    <div class="nk-tb-col"><span>Reference</span></div>
-                    <div class="nk-tb-col"><span>Passenger</span></div>
-                    <div class="nk-tb-col"><span>Route</span></div>
-                    <div class="nk-tb-col"><span>Date</span></div>
-                    <div class="nk-tb-col nk-tb-col-md"><span>Status</span></div>
-                </div>
+
+        {% if recent_bookings %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Passenger</th>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for booking in recent_bookings %}
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col">
-                        <span class="tb-lead"><a href="#">{{ booking.booking_reference }}</a></span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <span class="tb-sub">{{ booking.user.get_full_name }}</span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <span class="tb-sub">{{ booking.schedule.route.name }}</span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <span>{{ booking.schedule.departure_time|date:"M d, Y" }}</span>
-                    </div>
-                    <div class="nk-tb-col nk-tb-col-md">
+                <tr>
+                    <td><strong>{{ booking.booking_reference }}</strong></td>
+                    <td>{{ booking.user.get_full_name }}</td>
+                    <td>{{ booking.schedule.route.name }}</td>
+                    <td>{{ booking.schedule.departure_time|date:"M d, Y" }}</td>
+                    <td>
                         {% if booking.status == 'confirmed' %}
-                        <span class="badge badge-dim bg-success">Confirmed</span>
+                        <span class="badge badge-success"><em class="icon ni ni-check-circle"></em> Confirmed</span>
                         {% elif booking.status == 'pending' %}
-                        <span class="badge badge-dim bg-warning">Pending</span>
+                        <span class="badge badge-warning"><em class="icon ni ni-clock"></em> Pending</span>
                         {% else %}
-                        <span class="badge badge-dim bg-danger">Cancelled</span>
+                        <span class="badge badge-danger"><em class="icon ni ni-close-circle"></em> Cancelled</span>
                         {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col" colspan="5">
-                        <span class="text-muted">No recent bookings</span>
-                    </div>
-                </div>
+                    </td>
+                </tr>
                 {% endfor %}
-            </div>
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <em class="icon ni ni-inbox"></em>
+            <p>No recent bookings</p>
         </div>
+        {% endif %}
     </div>
 </div>
 
-<!-- RECENT PAYMENTS TABLE -->
+{# ── RECENT PAYMENTS ── #}
 <div class="col-12">
     <div class="nk-card">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Recent Payments</h5>
-            <div class="nk-tools">
-                <a href="{% url 'admin:payments_payment_changelist' %}" class="btn btn-sm btn-primary">View All</a>
-            </div>
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-cc-alt2"></em>
+                Recent Payments
+            </h3>
+            <a href="{% url 'admin:payments_payment_changelist' %}" class="btn btn-sm btn-primary">
+                <em class="icon ni ni-arrow-right"></em>
+                <span>View All</span>
+            </a>
         </div>
-        <div class="nk-card-body">
-            <div class="nk-tb-list">
-                <div class="nk-tb-item nk-tb-head">
-                    <div class="nk-tb-col"><span>Reference</span></div>
-                    <div class="nk-tb-col"><span>User</span></div>
-                    <div class="nk-tb-col"><span>Amount</span></div>
-                    <div class="nk-tb-col"><span>Status</span></div>
-                    <div class="nk-tb-col"><span>Date</span></div>
-                </div>
+
+        {% if recent_payments %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for payment in recent_payments %}
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col">
-                        <span class="tb-lead"><a href="#">{{ payment.payment_reference|truncatechars:12 }}</a></span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <span class="tb-sub">{{ payment.user.email }}</span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <span>${{ payment.amount }}</span>
-                    </div>
-                    <div class="nk-tb-col">
+                <tr>
+                    <td><strong>{{ payment.payment_reference|truncatechars:12 }}</strong></td>
+                    <td>{{ payment.user.email }}</td>
+                    <td>${{ payment.amount }}</td>
+                    <td>
                         {% if payment.status == 'paid' %}
-                        <span class="badge badge-dim bg-success">Paid</span>
+                        <span class="badge badge-success"><em class="icon ni ni-check-circle"></em> Paid</span>
                         {% elif payment.status == 'pending' %}
-                        <span class="badge badge-dim bg-warning">Pending</span>
+                        <span class="badge badge-warning"><em class="icon ni ni-clock"></em> Pending</span>
                         {% else %}
-                        <span class="badge badge-dim bg-danger">Failed</span>
+                        <span class="badge badge-danger"><em class="icon ni ni-close-circle"></em> Failed</span>
                         {% endif %}
-                    </div>
-                    <div class="nk-tb-col">
-                        <span>{{ payment.created|date:"M d, Y" }}</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col">
-                        <span class="text-muted">No recent payments</span>
-                    </div>
-                </div>
+                    </td>
+                    <td>{{ payment.created|date:"M d, Y" }}</td>
+                </tr>
                 {% endfor %}
-            </div>
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <em class="icon ni ni-inbox"></em>
+            <p>No recent payments</p>
         </div>
+        {% endif %}
     </div>
 </div>
 
-<!-- TOP ROUTES -->
+{# ── TOP ROUTES ── #}
 <div class="col-12">
     <div class="nk-card">
-        <div class="nk-card-head">
-            <h5 class="nk-card-title">Top Routes</h5>
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-map-pin"></em>
+                Top Routes
+            </h3>
         </div>
-        <div class="nk-card-body">
-            <div class="nk-tb-list">
-                <div class="nk-tb-item nk-tb-head">
-                    <div class="nk-tb-col"><span>Route</span></div>
-                    <div class="nk-tb-col"><span>Bookings</span></div>
-                    <div class="nk-tb-col"><span>Popularity</span></div>
-                </div>
+
+        {% if top_routes %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Bookings</th>
+                    <th>Popularity</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for route in top_routes %}
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col">
-                        <span class="tb-lead">{{ route.name }}</span>
-                        <span class="tb-sub">{{ route.origin }} → {{ route.destination }}</span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <span>{{ route.booking_count }}</span>
-                    </div>
-                    <div class="nk-tb-col">
-                        <div class="progress" style="height: 6px; width: 100px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ route.booking_count|add:1 }}%;"></div>
+                <tr>
+                    <td>
+                        <strong>{{ route.name }}</strong>
+                        <div style="font-size:11px; color:#8094ae; margin-top:2px;">
+                            {{ route.origin }} → {{ route.destination }}
                         </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col">
-                        <span class="text-muted">No routes data available</span>
-                    </div>
-                </div>
+                    </td>
+                    <td><strong>{{ route.booking_count }}</strong></td>
+                    <td>
+                        <div style="height:6px; background:#e2e8f0; border-radius:10px; width:100px; overflow:hidden;">
+                            <div style="height:100%; background:#6576ff; width:{{ route.booking_count|add:1 }}%; border-radius:10px;"></div>
+                        </div>
+                    </td>
+                </tr>
                 {% endfor %}
-            </div>
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <em class="icon ni ni-inbox"></em>
+            <p>No routes data</p>
         </div>
+        {% endif %}
     </div>
 </div>
 
