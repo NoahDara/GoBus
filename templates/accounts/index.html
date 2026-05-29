@@ -1,0 +1,383 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Users Management{% endblock %}
+
+{% block page_title %}Users Management{% endblock %}
+{% block page_sub_title %}Manage all registered users{% endblock %}
+
+{% block actions %}
+{% comment %} <li>
+    <a href="#" class="btn btn-primary">
+        <em class="icon ni ni-plus"></em>
+        <span>Invite User</span>
+    </a>
+</li> {% endcomment %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .stat-card {
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .stat-card.blue  { background: #e8ecff; border: 1px solid #b8c4ff; }
+    .stat-card.green { background: #e2f8f2; border: 1px solid #9fe8d4; }
+    .stat-card.amber { background: #fef3d8; border: 1px solid #fad383; }
+    .stat-card.red   { background: #fde8e8; border: 1px solid #f9b8b8; }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+        color: #fff;
+    }
+
+    .stat-card.blue  .stat-icon { background: #6576ff; }
+    .stat-card.green .stat-icon { background: #1ee0ac; }
+    .stat-card.amber .stat-icon { background: #f4bd0e; }
+    .stat-card.red   .stat-icon { background: #e85347; }
+
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 3px;
+    }
+
+    .stat-card.blue  .stat-label { color: #4050b5; }
+    .stat-card.green .stat-label { color: #0d7a60; }
+    .stat-card.amber .stat-label { color: #8a6200; }
+    .stat-card.red   .stat-label { color: #a33030; }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 3px;
+    }
+
+    .stat-card.blue  .stat-value { color: #2d3aaa; }
+    .stat-card.green .stat-value { color: #0a5e49; }
+    .stat-card.amber .stat-value { color: #6b4a00; }
+    .stat-card.red   .stat-value { color: #7e2424; }
+
+    .stat-sub { font-size: 12px; }
+    .stat-card.blue  .stat-sub { color: #5060cc; }
+    .stat-card.green .stat-sub { color: #0d7a60; }
+    .stat-card.amber .stat-sub { color: #8a6200; }
+    .stat-card.red   .stat-sub { color: #a33030; }
+
+    .nk-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 22px 24px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #364a63;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-header h3 em { font-size: 18px; color: #6576ff; }
+
+    .filter-box {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .filter-box input,
+    .filter-box select {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .filter-box button {
+        padding: 8px 16px;
+        background: #6576ff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+
+    .data-table thead tr {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .data-table th {
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #8094ae;
+    }
+
+    .data-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 13px;
+        color: #364a63;
+    }
+
+    .data-table tbody tr:hover { background: #f8fafc; }
+
+    .user-name {
+        font-weight: 700;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .user-email {
+        font-size: 11px;
+        color: #8094ae;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-admin {
+        background: #e8ecff;
+        color: #2d3aaa;
+    }
+
+    .badge-driver {
+        background: #fef3d8;
+        color: #8a6200;
+    }
+
+    .badge-passenger {
+        background: #e2f8f2;
+        color: #0a5e49;
+    }
+
+    .badge-active {
+        background: #e2f8f2;
+        color: #0a5e49;
+    }
+
+    .badge-inactive {
+        background: #fde8e8;
+        color: #a33030;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 11px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        background: #6576ff;
+        color: white;
+    }
+
+    .btn-sm:hover {
+        background: #5568d3;
+    }
+</style>
+
+{# ── STAT CARDS ── #}
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card blue">
+        <div class="stat-icon"><em class="icon ni ni-users"></em></div>
+        <div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-sub">All registered</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card red">
+        <div class="stat-icon"><em class="icon ni ni-shield-check"></em></div>
+        <div>
+            <div class="stat-label">Admin Users</div>
+            <div class="stat-value">{{ admin_users }}</div>
+            <div class="stat-sub">Staff members</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card amber">
+        <div class="stat-icon"><em class="icon ni ni-bus"></em></div>
+        <div>
+            <div class="stat-label">Drivers</div>
+            <div class="stat-value">{{ driver_users }}</div>
+            <div class="stat-sub">Active drivers</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card green">
+        <div class="stat-icon"><em class="icon ni ni-user"></em></div>
+        <div>
+            <div class="stat-label">Passengers</div>
+            <div class="stat-value">{{ passenger_users }}</div>
+            <div class="stat-sub">Regular users</div>
+        </div>
+    </div>
+</div>
+
+{# ── USERS TABLE ── #}
+<div class="col-12">
+    <div class="nk-card">
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-users"></em>
+                All Users
+            </h3>
+        </div>
+
+        {# Filters #}
+        <form method="get" class="filter-box">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Search by name or email..." 
+                value="{{ request.GET.q }}"
+            >
+            
+            <select name="role">
+                <option value="">All Roles</option>
+                <option value="admin" {% if request.GET.role == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="driver" {% if request.GET.role == 'driver' %}selected{% endif %}>Driver</option>
+                <option value="passenger" {% if request.GET.role == 'passenger' %}selected{% endif %}>Passenger</option>
+            </select>
+            
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+            
+            <button type="submit">Filter</button>
+        </form>
+
+        {% if users %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Last Login</th>
+                    {% comment %} <th>Action</th> {% endcomment %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                        <span class="user-email">@{{ user.username }}</span>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.is_superuser %}
+                        <span class="badge badge-admin">
+                            <em class="icon ni ni-crown"></em> Superuser
+                        </span>
+                        {% elif user.is_staff %}
+                        <span class="badge badge-admin">
+                            <em class="icon ni ni-shield-check"></em> Admin
+                        </span>
+                        {% elif user.driver %}
+                        <span class="badge badge-driver">
+                            <em class="icon ni ni-bus"></em> Driver
+                        </span>
+                        {% else %}
+                        <span class="badge badge-passenger">
+                            <em class="icon ni ni-user"></em> Passenger
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="badge badge-active">
+                            <em class="icon ni ni-check-circle"></em> Active
+                        </span>
+                        {% else %}
+                        <span class="badge badge-inactive">
+                            <em class="icon ni ni-close-circle"></em> Inactive
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        {% if user.last_login %}
+                        {{ user.last_login|date:"M d H:i" }}
+                        {% else %}
+                        <span style="color:#8094ae;">Never</span>
+                        {% endif %}
+                    </td>
+                    {% comment %} <td>
+                        <a href="{% url 'admin:auth_user_change' user.pk %}" class="btn-sm">
+                            View
+                        </a>
+                    </td> {% endcomment %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px; color: #8094ae;">
+            <em class="icon ni ni-inbox" style="font-size: 48px; opacity: 0.35; display: block; margin-bottom: 12px;"></em>
+            <p style="font-size: 14px; font-weight: 700; color: #364a63;">No users found</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.views.generic import View, TemplateView
+from django.views.generic import ListView, View, TemplateView
 from django.utils.decorators import method_decorator
 from django.db import IntegrityError
 from django.http import JsonResponse
@@ -369,3 +369,78 @@ class ChangePasswordView(LoginRequiredMixin, View):
         logger.info(f"User {user.username} changed password")
         messages.success(request, 'Password changed successfully!')
         return redirect('profile')
+    
+from django.db.models import Q
+class UserIndexView(LoginRequiredMixin, ListView):
+    """
+    List all users with proper categorization:
+    - Admin: is_staff=True
+    - Driver: has Driver profile
+    - Passenger: not staff AND no Driver profile
+    """
+    model = User
+    template_name = 'accounts/index.html'
+    context_object_name = 'users'
+    paginate_by = 20
+ 
+    def get_queryset(self):
+        queryset = User.objects.all().select_related('driver').order_by('-date_joined')
+        
+        # Search
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                Q(username__icontains=search_query) |
+                Q(email__icontains=search_query) |
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
+            )
+        
+        # Filter by role
+        role = self.request.GET.get('role')
+        if role == 'admin':
+            queryset = queryset.filter(is_staff=True)
+        elif role == 'driver':
+            # Users with Driver profile
+            queryset = queryset.filter(driver__isnull=False)
+        elif role == 'passenger':
+            # Users WITHOUT driver profile AND not staff
+            queryset = queryset.filter(
+                is_staff=False,
+                is_superuser=False,
+                driver__isnull=True
+            )
+        
+        # Filter by status
+        status = self.request.GET.get('status')
+        if status == 'active':
+            queryset = queryset.filter(is_active=True)
+        elif status == 'inactive':
+            queryset = queryset.filter(is_active=False)
+        
+        return queryset
+ 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Total counts
+        context['total_users'] = User.objects.count()
+        
+        # Admin count
+        context['admin_users'] = User.objects.filter(is_staff=True).count()
+        
+        # Driver count (has Driver profile)
+        context['driver_users'] = User.objects.filter(driver__isnull=False).count()
+        
+        # Passenger count (not staff AND no Driver profile)
+        context['passenger_users'] = User.objects.filter(
+            is_staff=False,
+            is_superuser=False,
+            driver__isnull=True
+        ).count()
+        
+        # Active/Inactive
+        context['active_users'] = User.objects.filter(is_active=True).count()
+        context['inactive_users'] = User.objects.filter(is_active=False).count()
+        
+        return context
