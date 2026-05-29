@@ -254,3 +254,92 @@ class RouteSegmentForm(forms.ModelForm):
         
         return cleaned_data
  
+ 
+class ScheduleForm(forms.ModelForm):
+    """Form for creating/updating schedules"""
+    
+    class Meta:
+        model = Schedule
+        fields = ('bus', 'route', 'departure_time', 'arrival_time')
+        widgets = {
+            'bus': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'route': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'departure_time': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local',
+                'placeholder': 'YYYY-MM-DD HH:MM',
+            }),
+            'arrival_time': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local',
+                'placeholder': 'YYYY-MM-DD HH:MM',
+            }),
+        }
+        labels = {
+            'bus': 'Select Bus',
+            'route': 'Select Route',
+            'departure_time': 'Departure Time',
+            'arrival_time': 'Arrival Time',
+        }
+ 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Filter only operational buses
+        from .models import Bus
+        self.fields['bus'].queryset = Bus.objects.filter(
+            is_operational=True, 
+            is_active=True
+        ).select_related('driver__user')
+        
+        # Filter only non-reverse routes
+        from .models import Route
+        self.fields['route'].queryset = Route.objects.filter(
+            is_reverse=False,
+            is_active=True
+        )
+        
+        # Set empty labels
+        self.fields['bus'].empty_label = "— Select Bus —"
+        self.fields['route'].empty_label = "— Select Route —"
+ 
+    def clean(self):
+        cleaned_data = super().clean()
+        departure = cleaned_data.get('departure_time')
+        arrival = cleaned_data.get('arrival_time')
+        
+        if departure and arrival:
+            if arrival <= departure:
+                raise forms.ValidationError(
+                    "Arrival time must be after departure time."
+                )
+            
+            # Check duration doesn't exceed 24 hours
+            duration = arrival - departure
+            if duration.total_seconds() > 86400:  # 24 hours
+                raise forms.ValidationError(
+                    "Schedule duration cannot exceed 24 hours."
+                )
+        
+        return cleaned_data
+ 
+ 
+class ScheduleStatusForm(forms.ModelForm):
+    """Form for updating schedule status only"""
+    
+    class Meta:
+        model = Schedule
+        fields = ('status',)
+        widgets = {
+            'status': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+        }
+        labels = {
+            'status': 'Schedule Status',
+        }
+ 

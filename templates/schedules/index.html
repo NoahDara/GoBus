@@ -1,0 +1,296 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Schedules{% endblock %}
+
+{% block page_title %}All Schedules{% endblock %}
+{% block page_sub_title %}Manage bus schedules and operations{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="{% url 'schedules-create' %}" class="btn btn-primary">
+        <em class="icon ni ni-plus"></em>
+        <span>Add Schedule</span>
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .stat-card {
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .stat-card.blue  { background: #e8ecff; border: 1px solid #b8c4ff; }
+    .stat-card.green { background: #e2f8f2; border: 1px solid #9fe8d4; }
+    .stat-card.amber { background: #fef3d8; border: 1px solid #fad383; }
+    .stat-card.red   { background: #fde8e8; border: 1px solid #f9b8b8; }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+        color: #fff;
+    }
+
+    .stat-card.blue  .stat-icon { background: #6576ff; }
+    .stat-card.green .stat-icon { background: #1ee0ac; }
+    .stat-card.amber .stat-icon { background: #f0ad4e; }
+    .stat-card.red   .stat-icon { background: #e85347; }
+
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 3px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .nk-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 22px 24px;
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .schedule-table th {
+        padding: 12px 14px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #8094ae;
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .schedule-table td {
+        padding: 14px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 13px;
+        color: #364a63;
+    }
+
+    .schedule-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-scheduled { background: #e8ecff; color: #2d3aaa; }
+    .badge-in_progress { background: #fef3d8; color: #8a6200; }
+    .badge-completed { background: #e2f8f2; color: #0a5e49; }
+    .badge-cancelled { background: #fde8e8; color: #7e2424; }
+
+    .filters {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .filter-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+        background: #6576ff;
+        color: white;
+        border-color: #6576ff;
+    }
+
+    .filter-btn:hover {
+        border-color: #6576ff;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        color: #8094ae;
+    }
+</style>
+
+{# ── STAT CARDS ── #}
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card blue">
+        <div class="stat-icon"><em class="icon ni ni-calendar"></em></div>
+        <div>
+            <div class="stat-label">Total Schedules</div>
+            <div class="stat-value">{{ total_schedules }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card amber">
+        <div class="stat-icon"><em class="icon ni ni-alert-circle"></em></div>
+        <div>
+            <div class="stat-label">Scheduled</div>
+            <div class="stat-value">{{ scheduled_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card green">
+        <div class="stat-icon"><em class="icon ni ni-check-circle"></em></div>
+        <div>
+            <div class="stat-label">In Progress</div>
+            <div class="stat-value">{{ in_progress_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-6 col-xl-3">
+    <div class="stat-card red">
+        <div class="stat-icon"><em class="icon ni ni-trash"></em></div>
+        <div>
+            <div class="stat-label">Cancelled</div>
+            <div class="stat-value">{{ cancelled_count }}</div>
+        </div>
+    </div>
+</div>
+
+{# ── SCHEDULES TABLE ── #}
+<div class="col-12">
+    <div class="nk-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #e2e8f0;">
+            <h3 style="font-size: 15px; font-weight: 700; color: #364a63; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <em class="icon ni ni-calendar" style="color: #6576ff;"></em>
+                All Schedules
+            </h3>
+        </div>
+
+        {# Filters #}
+        <div class="filters">
+            <a href="?status=scheduled" class="filter-btn {% if request.GET.status == 'scheduled' %}active{% endif %}">
+                Scheduled ({{ scheduled_count }})
+            </a>
+            <a href="?status=in_progress" class="filter-btn {% if request.GET.status == 'in_progress' %}active{% endif %}">
+                In Progress ({{ in_progress_count }})
+            </a>
+            <a href="?status=completed" class="filter-btn {% if request.GET.status == 'completed' %}active{% endif %}">
+                Completed ({{ completed_count }})
+            </a>
+            <a href="?status=cancelled" class="filter-btn {% if request.GET.status == 'cancelled' %}active{% endif %}">
+                Cancelled ({{ cancelled_count }})
+            </a>
+            <a href="{% url 'schedules-index' %}" class="filter-btn">Reset</a>
+        </div>
+
+        {% if schedules %}
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Bus</th>
+                    <th>Route</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                    <th>Bookings</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schedule in schedules %}
+                <tr>
+                    <td>
+                        <strong>{{ schedule.bus.bus_number }}</strong>
+                        {% if schedule.bus.driver %}
+                        <br><small style="color: #8094ae;">{{ schedule.bus.driver.get_full_name }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ schedule.route.name }}</strong>
+                        <br><small style="color: #8094ae;">{{ schedule.route.origin }} → {{ schedule.route.destination }}</small>
+                    </td>
+                    <td>{{ schedule.departure_time|date:"M d, H:i" }}</td>
+                    <td>{{ schedule.arrival_time|date:"M d, H:i" }}</td>
+                    <td>
+                        <strong>{{ schedule.total_bookings }}</strong> bookings
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ schedule.status }}">
+                            {% if schedule.status == 'scheduled' %}
+                            <em class="icon ni ni-calendar"></em> Scheduled
+                            {% elif schedule.status == 'in_progress' %}
+                            <em class="icon ni ni-play"></em> In Progress
+                            {% elif schedule.status == 'completed' %}
+                            <em class="icon ni ni-check-circle"></em> Completed
+                            {% else %}
+                            <em class="icon ni ni-close-circle"></em> Cancelled
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{% url 'schedules-detail' schedule.uid %}" class="btn btn-sm btn-outline-primary" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">
+                            <em class="icon ni ni-eye"></em> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if is_paginated %}
+        <div style="display: flex; justify-content: center; align-items: center; gap: 8px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-sm btn-outline-primary" style="padding: 6px 12px;">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-primary" style="padding: 6px 12px;">Previous</a>
+            {% endif %}
+            <span style="font-size: 12px; color: #8094ae;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-primary" style="padding: 6px 12px;">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-sm btn-outline-primary" style="padding: 6px 12px;">Last</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+            <em class="icon ni ni-calendar"></em>
+            <p>No schedules yet</p>
+            <a href="{% url 'schedules-create' %}" class="btn btn-primary" style="margin-top: 12px;">Create Your First Schedule</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

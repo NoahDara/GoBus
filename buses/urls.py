@@ -1,9 +1,9 @@
-# buses/urls.py - Updated with routes
+# buses/urls.py - Complete updated URLs with schedules
 
 from django.urls import path
 from . import views
 
-# NO app_name - names are buses-index, routes-index, etc.
+# NO app_name
 
 urlpatterns = [
     # ════ BUSES ════
@@ -32,4 +32,11 @@ urlpatterns = [
     path('routes/<uuid:uid>/segments/create/', views.RouteSegmentCreateView.as_view(), name='route-segments-create'),
     path('routes/segments/<uuid:uid>/update/', views.RouteSegmentUpdateView.as_view(), name='route-segments-update'),
     path('routes/segments/<uuid:uid>/delete/', views.RouteSegmentDeleteView.as_view(), name='route-segments-delete'),
+    
+    # ════ SCHEDULES ════
+    path('schedules/', views.ScheduleListView.as_view(), name='schedules-index'),
+    path('schedules/create/', views.ScheduleCreateView.as_view(), name='schedules-create'),
+    path('schedules/<uuid:uid>/', views.ScheduleDetailView.as_view(), name='schedules-detail'),
+    path('schedules/<uuid:uid>/status/', views.ScheduleStatusChangeView.as_view(), name='schedules-status'),
+    path('schedules/<uuid:uid>/cancel/', views.ScheduleCancelView.as_view(), name='schedules-cancel'),
 ]

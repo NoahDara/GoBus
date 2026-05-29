@@ -1,0 +1,466 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ schedule.route.name }} - {{ schedule.departure_time|date:"M d" }}{% endblock %}
+
+{% block page_title %}Schedule Details{% endblock %}
+{% block page_sub_title %}{{ schedule.route.name }} - {{ schedule.departure_time|date:"M d, Y H:i" }}{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="{% url 'schedules-index' %}" class="btn btn-white btn-dim btn-outline-primary">
+        <em class="icon ni ni-arrow-left"></em>
+        <span>Back</span>
+    </a>
+</li>
+<li>
+    {% if schedule.status not in 'completed cancelled' %}
+    <a href="#" data-bs-toggle="modal" data-bs-target="#cancelModal" class="btn btn-outline-danger">
+        <em class="icon ni ni-trash"></em>
+        <span>Cancel</span>
+    </a>
+    {% endif %}
+</li>
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .hero-card {
+        background: linear-gradient(135deg, #6576ff 0%, #5568d3 100%);
+        color: white;
+        border-radius: 14px;
+        padding: 28px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .hero-info h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 8px;
+    }
+
+    .hero-info p {
+        font-size: 14px;
+        margin: 0 0 16px;
+        opacity: 0.95;
+    }
+
+    .hero-status {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: rgba(255,255,255,0.2);
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .panel-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+
+    .panel-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8094ae;
+        letter-spacing: .4px;
+        margin: 0 0 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .info-item {
+        padding: 0;
+    }
+
+    .info-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8094ae;
+        letter-spacing: .4px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #364a63;
+    }
+
+    .status-dropdown {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .form-select {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #6576ff;
+        box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.1);
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-primary { background: #6576ff; color: white; }
+    .btn-primary:hover { background: #5568d3; }
+    .btn-danger { background: #e85347; color: white; }
+
+    .stat-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px;
+        text-align: center;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8094ae;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: #364a63;
+    }
+
+    .bookings-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .bookings-table th {
+        padding: 10px;
+        text-align: left;
+        font-weight: 700;
+        color: #8094ae;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .bookings-table td {
+        padding: 10px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #364a63;
+    }
+
+    .bookings-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-confirmed { background: #e2f8f2; color: #0a5e49; }
+    .badge-pending { background: #fef3d8; color: #8a6200; }
+    .badge-cancelled { background: #fde8e8; color: #7e2424; }
+
+    .paid { background: #e2f8f2; color: #0a5e49; }
+    .unpaid { background: #fef3d8; color: #8a6200; }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #8094ae;
+    }
+
+    .empty-state em {
+        font-size: 32px;
+        display: block;
+        margin-bottom: 10px;
+        opacity: 0.3;
+    }
+</style>
+
+{# ── HERO ── #}
+<div class="col-12">
+    <div class="hero-card">
+        <div class="hero-info">
+            <h1>{{ schedule.route.name }}</h1>
+            <p><em class="icon ni ni-calendar"></em> {{ schedule.departure_time|date:"l, M d, Y H:i" }} → {{ schedule.arrival_time|date:"H:i" }}</p>
+            <div class="hero-status">
+                {% if schedule.status == 'scheduled' %}
+                📅 Scheduled
+                {% elif schedule.status == 'in_progress' %}
+                🚌 In Progress
+                {% elif schedule.status == 'completed' %}
+                ✅ Completed
+                {% else %}
+                ❌ Cancelled
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── MAIN CONTENT ── #}
+<div class="col-12 col-lg-8">
+    
+    {# Schedule Info #}
+    <div class="panel-card">
+        <div class="panel-title">
+            <em class="icon ni ni-calendar" style="color: #6576ff;"></em> Schedule Information
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Bus</span>
+                <span class="info-value">{{ schedule.bus.bus_number }}</span>
+                <span style="font-size: 11px; color: #8094ae;">Plate: {{ schedule.bus.plate_number }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Route</span>
+                <span class="info-value">{{ schedule.route.origin }} → {{ schedule.route.destination }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Departure</span>
+                <span class="info-value">{{ schedule.departure_time|date:"H:i" }}</span>
+                <span style="font-size: 11px; color: #8094ae;">{{ schedule.departure_time|date:"M d, Y" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Arrival</span>
+                <span class="info-value">{{ schedule.arrival_time|date:"H:i" }}</span>
+                <span style="font-size: 11px; color: #8094ae;">{{ schedule.arrival_time|date:"M d, Y" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Duration</span>
+                <span class="info-value">{{ duration }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Bus Capacity</span>
+                <span class="info-value">{{ schedule.bus.capacity }}</span>
+                <span style="font-size: 11px; color: #8094ae;">Available: {{ schedule.available_seats }}</span>
+            </div>
+        </div>
+    </div>
+
+    {# Status Change #}
+    <div class="panel-card">
+        <div class="panel-title">
+            <em class="icon ni ni-settings" style="color: #6576ff;"></em> Schedule Status
+        </div>
+        
+        <form method="post" action="{% url 'schedules-status' schedule.uid %}" class="status-dropdown">
+            {% csrf_token %}
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="scheduled" {% if schedule.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                <option value="in_progress" {% if schedule.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if schedule.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="cancelled" {% if schedule.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+        </form>
+    </div>
+
+    {# Bus Details #}
+    <div class="panel-card">
+        <div class="panel-title">
+            <em class="icon ni ni-car" style="color: #6576ff;"></em> Bus Details
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Bus Number</span>
+                <span class="info-value">{{ schedule.bus.bus_number }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Plate Number</span>
+                <span class="info-value">{{ schedule.bus.plate_number }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Capacity</span>
+                <span class="info-value">{{ schedule.bus.capacity }} seats</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Driver</span>
+                <span class="info-value">
+                    {% if schedule.bus.driver %}
+                    {{ schedule.bus.driver.get_full_name }}
+                    {% else %}
+                    <span style="color: #8094ae;">Not assigned</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                    {% if schedule.bus.is_operational %}
+                    <span style="color: #1ee0ac;">✓ Operational</span>
+                    {% else %}
+                    <span style="color: #e85347;">✗ Maintenance</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# Bookings #}
+    <div class="panel-card">
+        <div class="panel-title">
+            <em class="icon ni ni-ticket" style="color: #6576ff;"></em> Bookings ({{ total_bookings }})
+        </div>
+        
+        {% if bookings %}
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Passenger</th>
+                    <th>Seat</th>
+                    <th>Fare</th>
+                    <th>Booking Status</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>
+                        <strong>{{ booking.user.get_full_name }}</strong>
+                        <br><small>{{ booking.user.email }}</small>
+                    </td>
+                    <td>
+                        {% if booking.seat %}
+                        Seat {{ booking.seat.seat_number }}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>${{ booking.fare }}</td>
+                    <td>
+                        <span class="badge badge-{{ booking.status }}">
+                            {% if booking.status == 'confirmed' %}
+                            ✓ Confirmed
+                            {% elif booking.status == 'pending' %}
+                            ⏳ Pending
+                            {% else %}
+                            ✗ Cancelled
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if booking.payment %}
+                            {% if booking.payment.status == 'paid' %}
+                            <span class="badge paid">💳 Paid</span>
+                            {% else %}
+                            <span class="badge unpaid">⏳ Unpaid</span>
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <em class="icon ni ni-ticket"></em>
+            <p>No bookings yet</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{# ── SIDEBAR ── #}
+<div class="col-12 col-lg-4">
+    
+    {# Stats #}
+    <div class="stat-box" style="margin-bottom: 16px;">
+        <div class="stat-label">Confirmed Bookings</div>
+        <div class="stat-value">{{ confirmed_bookings }}</div>
+    </div>
+
+    <div class="stat-box" style="margin-bottom: 16px;">
+        <div class="stat-label">Pending Bookings</div>
+        <div class="stat-value">{{ pending_bookings }}</div>
+    </div>
+
+    <div class="stat-box" style="margin-bottom: 16px;">
+        <div class="stat-label">Available Seats</div>
+        <div class="stat-value">{{ available_seats }}</div>
+    </div>
+
+    <div class="stat-box" style="margin-bottom: 16px;">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value">${{ total_revenue|floatformat:2 }}</div>
+    </div>
+
+    <div class="stat-box">
+        <div class="stat-label">Pending Revenue</div>
+        <div class="stat-value">${{ pending_revenue|floatformat:2 }}</div>
+    </div>
+
+</div>
+
+{# ── CANCEL MODAL ── #}
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content" style="border: 1px solid #e2e8f0; border-radius: 12px;">
+            <div class="modal-header" style="background: #fde8e8; border-bottom: 1px solid #f9b8b8;">
+                <h5 class="modal-title"><em class="icon ni ni-trash" style="color: #e85347;"></em> Cancel Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13px; color: #8094ae;">Are you sure you want to cancel this schedule? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer" style="background: #fde8e8; gap: 8px;">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">No, Keep It</button>
+                <form method="post" action="{% url 'schedules-cancel' schedule.uid %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">Yes, Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
