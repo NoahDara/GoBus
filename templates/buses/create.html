@@ -1,0 +1,245 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Create Bus{% endblock %}
+
+{% block page_title %}Create New Bus{% endblock %}
+{% block page_sub_title %}Add a new bus to your fleet{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="{% url 'buses-index' %}" class="btn btn-white btn-dim btn-outline-primary">
+        <em class="icon ni ni-arrow-left"></em>
+        <span>Back</span>
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+
+    .form-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #6576ff;
+        letter-spacing: .4px;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e8ecff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8094ae;
+        letter-spacing: .4px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-label.required::after {
+        content: ' *';
+        color: #e85347;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 13px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #6576ff;
+        box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.1);
+    }
+
+    .form-hint {
+        font-size: 11px;
+        color: #8094ae;
+        margin-top: 4px;
+    }
+
+    .form-error {
+        font-size: 11px;
+        color: #e85347;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .form-error::before {
+        content: '⚠';
+        font-size: 10px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-primary {
+        background: #6576ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .btn-secondary {
+        background: #f0f2f5;
+        color: #364a63;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .error-alert {
+        background: #fde8e8;
+        border: 1px solid #f9b8b8;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 20px;
+        color: #a33030;
+        font-size: 12px;
+    }
+
+    .error-alert em {
+        font-size: 14px;
+        margin-right: 8px;
+    }
+
+    .success-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="col-12 col-lg-8" style="margin: 0 auto;">
+    <div class="form-card">
+        {% if form.non_field_errors %}
+        <div class="error-alert">
+            <em class="icon ni ni-alert-circle"></em>
+            {{ form.non_field_errors.0 }}
+        </div>
+        {% endif %}
+
+        <div class="form-title">
+            <em class="icon ni ni-bus"></em> Bus Information
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                {# Bus Number #}
+                <div class="form-group">
+                    <label class="form-label required">Bus Number</label>
+                    {{ form.bus_number }}
+                    {% if form.bus_number.errors %}
+                        {% for error in form.bus_number.errors %}
+                        <div class="form-error">{{ error }}</div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="form-hint">Unique identifier (e.g. BUS001, BUS002)</div>
+                    {% endif %}
+                </div>
+
+                {# Plate Number #}
+                <div class="form-group">
+                    <label class="form-label required">Plate Number</label>
+                    {{ form.plate_number }}
+                    {% if form.plate_number.errors %}
+                        {% for error in form.plate_number.errors %}
+                        <div class="form-error">{{ error }}</div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="form-hint">Vehicle registration (e.g. ZW123ABC)</div>
+                    {% endif %}
+                </div>
+
+                {# Capacity #}
+                <div class="form-group">
+                    <label class="form-label required">Seat Capacity</label>
+                    {{ form.capacity }}
+                    {% if form.capacity.errors %}
+                        {% for error in form.capacity.errors %}
+                        <div class="form-error">{{ error }}</div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="form-hint">Number of seats (1-100)</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="background: #e8ecff; border: 1px solid #b8c4ff; border-radius: 8px; padding: 12px; margin-top: 16px; font-size: 12px; color: #2d3aaa;">
+                <em class="icon ni ni-info-alt"></em> 
+                <strong>Note:</strong> You can assign a driver and toggle operational status after creating the bus.
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'buses-index' %}" class="btn btn-secondary">
+                    <em class="icon ni ni-arrow-left"></em> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <em class="icon ni ni-plus"></em> Create Bus
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
