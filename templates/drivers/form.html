@@ -1,0 +1,303 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_sub_title %}Fill in driver information{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="{% url 'drivers-index' %}" class="btn btn-white btn-dim btn-outline-primary">
+        <em class="icon ni ni-arrow-left"></em>
+        <span>Cancel</span>
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .nk-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #8094ae;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: inherit;
+        color: #364a63;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #6576ff;
+        box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-group.checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .form-group.checkbox input {
+        width: auto;
+        cursor: pointer;
+    }
+
+    .form-group.checkbox label {
+        margin: 0;
+        text-transform: none;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .form-error {
+        color: #e85347;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .alert {
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .alert-info {
+        background: #e8ecff;
+        border: 1px solid #b8c4ff;
+        color: #2d3aaa;
+    }
+
+    .alert-info em {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: #6576ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #364a63;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    @media (max-width: 768px) {
+        .form-row { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="col-lg-8">
+    <div class="nk-card">
+        {% if create_user %}
+        <div class="alert alert-info">
+            <em class="icon ni ni-info-circle"></em>
+            <div>
+                <strong>User Account Option</strong><br>
+                Check the box below to create a user account. Driver will receive welcome email.
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
+                <h4 style="font-size: 14px; font-weight: 700; color: #364a63; margin-bottom: 16px;">
+                    <em class="icon ni ni-user"></em> Personal Information
+                </h4>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_first_name">First Name *</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <div class="form-error">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_last_name">Last Name *</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <div class="form-error">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_email">Email *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="form-error">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_phone_number">Phone Number *</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                        <div class="form-error">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_date_of_birth">Date of Birth</label>
+                        {{ form.date_of_birth }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_gender">Gender</label>
+                        {{ form.gender }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
+                <h4 style="font-size: 14px; font-weight: 700; color: #364a63; margin-bottom: 16px;">
+                    <em class="icon ni ni-card"></em> License Information
+                </h4>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_license_number">License Number *</label>
+                        {{ form.license_number }}
+                        {% if form.license_number.errors %}
+                        <div class="form-error">{{ form.license_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_license_expiry">License Expiry *</label>
+                        {{ form.license_expiry }}
+                        {% if form.license_expiry.errors %}
+                        <div class="form-error">{{ form.license_expiry.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if create_user %}
+            <div style="margin-bottom: 28px; padding: 16px; background: #e8ecff; border: 1px solid #b8c4ff; border-radius: 8px;">
+                <div class="form-group checkbox">
+                    <input 
+                        type="checkbox" 
+                        id="create_user_account" 
+                        name="create_user_account"
+                        value="on"
+                    >
+                    <label for="create_user_account">
+                        Create user account for this driver
+                    </label>
+                </div>
+
+                <div id="username_field" style="display: none;">
+                    <div class="form-group">
+                        <label for="username">Username (optional)</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username"
+                            placeholder="Auto-generated if empty"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const checkbox = document.getElementById('create_user_account');
+                const usernameField = document.getElementById('username_field');
+                checkbox.addEventListener('change', function() {
+                    usernameField.style.display = this.checked ? 'block' : 'none';
+                });
+            </script>
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <em class="icon ni ni-save"></em> Save
+                </button>
+                <a href="{% url 'drivers-index' %}" class="btn btn-secondary">
+                    <em class="icon ni ni-arrow-left"></em> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

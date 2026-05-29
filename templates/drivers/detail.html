@@ -1,0 +1,323 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ driver.first_name }} {{ driver.last_name }}{% endblock %}
+
+{% block page_title %}{{ driver.first_name }} {{ driver.last_name }}{% endblock %}
+{% block page_sub_title %}Driver Profile & Management{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="{% url 'drivers-update' driver.uid %}" class="btn btn-primary">
+        <em class="icon ni ni-edit"></em>
+        <span>Edit</span>
+    </a>
+</li>
+<li>
+    <a href="{% url 'drivers-index' %}" class="btn btn-white btn-dim btn-outline-primary">
+        <em class="icon ni ni-arrow-left"></em>
+        <span>Back</span>
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .nk-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin-bottom: 20px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-header h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #364a63;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-header h3 em { font-size: 18px; color: #6576ff; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .info-item {
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .info-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #8094ae;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: #364a63;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-success {
+        background: #e2f8f2;
+        color: #0a5e49;
+    }
+
+    .badge-warning {
+        background: #fef3d8;
+        color: #8a6200;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-primary {
+        background: #6576ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .btn-success {
+        background: #1ee0ac;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #16c494;
+    }
+
+    .btn-warning {
+        background: #f4bd0e;
+        color: white;
+    }
+
+    .btn-warning:hover {
+        background: #d9a60a;
+    }
+
+    .btn-danger {
+        background: #e85347;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #d9423f;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .status-badge.active {
+        background: #e2f8f2;
+        color: #0a5e49;
+    }
+
+    .status-badge.inactive {
+        background: #fde8e8;
+        color: #a33030;
+    }
+
+    .status-badge.pending {
+        background: #fef3d8;
+        color: #8a6200;
+    }
+
+    @media (max-width: 768px) {
+        .info-grid { grid-template-columns: 1fr; }
+        .action-buttons { flex-direction: column; }
+    }
+</style>
+
+<div class="col-lg-8">
+    <div class="nk-card">
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-user"></em>
+                Personal Information
+            </h3>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">First Name</div>
+                <div class="info-value">{{ driver.first_name }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Last Name</div>
+                <div class="info-value">{{ driver.last_name }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">{{ driver.email }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Phone</div>
+                <div class="info-value">{{ driver.phone_number }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">License Number</div>
+                <div class="info-value">{{ driver.license_number }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">License Expiry</div>
+                <div class="info-value">{{ driver.license_expiry|date:"M d, Y" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nk-card">
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-lock"></em>
+                User Account Management
+            </h3>
+        </div>
+
+        {% if has_user %}
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Username</div>
+                <div class="info-value">{{ driver.user.username }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Status</div>
+                <div style="padding-top: 2px;">
+                    {% if user_active %}
+                    <span class="status-badge active">
+                        <em class="icon ni ni-check-circle"></em> Active
+                    </span>
+                    {% else %}
+                    <span class="status-badge inactive">
+                        <em class="icon ni ni-close-circle"></em> Inactive
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            {% if user_active %}
+            <form method="post" action="{% url 'drivers-deactivate-user' driver.uid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning" onclick="return confirm('Deactivate this user?');">
+                    <em class="icon ni ni-close-circle"></em> Deactivate
+                </button>
+            </form>
+            {% else %}
+            <form method="post" action="{% url 'drivers-activate-user' driver.uid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    <em class="icon ni ni-check-circle"></em> Activate
+                </button>
+            </form>
+            {% endif %}
+
+            <form method="post" action="{% url 'drivers-resend-email' driver.uid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <em class="icon ni ni-mail"></em> Resend Email
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div style="padding: 30px; background: #fef3d8; border: 1px solid #fad383; border-radius: 8px; text-align: center;">
+            <div style="font-size: 32px; color: #f4bd0e; margin-bottom: 12px;">
+                <em class="icon ni ni-clock"></em>
+            </div>
+            <div style="font-size: 14px; font-weight: 700; color: #8a6200; margin-bottom: 16px;">
+                No User Account Yet
+            </div>
+            <form method="post" action="{% url 'drivers-create-user' driver.uid %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    <em class="icon ni ni-plus-circle"></em> Create User Account
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="col-lg-4">
+    <div class="nk-card">
+        <div class="section-header">
+            <h3>
+                <em class="icon ni ni-info"></em>
+                Actions
+            </h3>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <a href="{% url 'drivers-update' driver.uid %}" class="btn btn-primary" style="justify-content: center;">
+                <em class="icon ni ni-edit"></em> Edit Driver
+            </a>
+            <a href="{% url 'drivers-delete' driver.uid %}" class="btn btn-danger" style="justify-content: center;" onclick="return confirm('Are you sure?');">
+                <em class="icon ni ni-trash"></em> Delete Driver
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

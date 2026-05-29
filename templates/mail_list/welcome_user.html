@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to GoBus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #364a63;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-wrapper {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 16px;
+            font-weight: 700;
+            color: #364a63;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+        .highlight-box {
+            background: #e8ecff;
+            border-left: 4px solid #6576ff;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 24px 0;
+        }
+        .highlight-box strong {
+            display: block;
+            color: #2d3aaa;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .highlight-box p {
+            font-size: 13px;
+            color: #364a63;
+        }
+        .credentials {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+            border: 1px solid #e2e8f0;
+        }
+        .credentials-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .credentials-row:last-child {
+            border-bottom: none;
+        }
+        .credentials-label {
+            font-weight: 600;
+            color: #8094ae;
+        }
+        .credentials-value {
+            font-weight: 700;
+            color: #364a63;
+            font-family: 'Courier New', monospace;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 24px 0;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .steps {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .step {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .step:last-child {
+            margin-bottom: 0;
+        }
+        .step-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: #6576ff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .step-content h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #364a63;
+            margin-bottom: 4px;
+        }
+        .step-content p {
+            font-size: 12px;
+            color: #718096;
+        }
+        .footer {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #8094ae;
+        }
+        .footer p {
+            margin-bottom: 8px;
+        }
+        .footer-links {
+            margin-top: 12px;
+        }
+        .footer-links a {
+            color: #6576ff;
+            text-decoration: none;
+            margin: 0 12px;
+        }
+        .icon {
+            font-size: 18px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .cta-button {
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <!-- Header -->
+            <div class="header">
+                <h1>🚌 Welcome to GoBus</h1>
+                <p>Your driver account is ready</p>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <div class="greeting">
+                    Hello {{ user.first_name }} {{ user.last_name }},
+                </div>
+
+                <div class="message">
+                    We're excited to have you join the GoBus team! Your driver account has been successfully created. 
+                    To get started, you need to set up your password using the link below.
+                </div>
+
+                <!-- Highlight Box -->
+                <div class="highlight-box">
+                    <strong>⏱️ Action Required</strong>
+                    <p>
+                        Your password reset link is valid for <strong>24 hours</strong>. 
+                        After that, please contact your administrator to resend the invitation.
+                    </p>
+                </div>
+
+                <!-- Credentials -->
+                <div class="credentials">
+                    <div class="credentials-row">
+                        <span class="credentials-label">Email:</span>
+                        <span class="credentials-value">{{ user.email }}</span>
+                    </div>
+                    <div class="credentials-row">
+                        <span class="credentials-label">Username:</span>
+                        <span class="credentials-value">{{ user.username }}</span>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Click the button below</h3>
+                            <p>Click "Set Your Password" to begin the setup process</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Create a strong password</h3>
+                            <p>Choose a secure password with at least 8 characters</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Login to your account</h3>
+                            <p>Use your username and password to access the driver dashboard</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <center>
+                    <a href="{{ reset_url }}" class="cta-button">
+                        <span>🔐</span> Set Your Password
+                    </a>
+                </center>
+
+                <!-- Copy Link -->
+                <div style="background: #fef3d8; border: 1px solid #fad383; border-radius: 6px; padding: 16px; margin: 24px 0; text-align: center;">
+                    <small style="color: #8a6200;">
+                        <strong>Or copy this link:</strong><br>
+                        <span style="font-family: 'Courier New', monospace; word-break: break-all; font-size: 11px;">
+                            {{ reset_url }}
+                        </span>
+                    </small>
+                </div>
+
+                <div class="message">
+                    Once you've set your password, you'll be able to:
+                </div>
+
+                <ul style="margin: 0 0 24px 20px; font-size: 14px; color: #718096;">
+                    <li style="margin-bottom: 8px;">
+                        <strong style="color: #364a63;">View your assigned bus</strong> - Check current assignments and details
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <strong style="color: #364a63;">Manage your schedule</strong> - See upcoming trips and routes
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <strong style="color: #364a63;">Track earnings</strong> - Monitor your income and statistics
+                    </li>
+                    <li>
+                        <strong style="color: #364a63;">Update your profile</strong> - Manage your personal information
+                    </li>
+                </ul>
+
+                <div class="message">
+                    If you have any questions or need assistance, please contact our support team.
+                </div>
+
+                <div class="message">
+                    Best regards,<br>
+                    <strong style="color: #364a63;">The GoBus Team</strong>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>This is an automated message, please do not reply to this email.</p>
+                <div class="footer-links">
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact Support</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+                <p style="margin-top: 16px; font-size: 11px;">
+                    © 2026 GoBus. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
