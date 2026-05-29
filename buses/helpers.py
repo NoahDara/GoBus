@@ -110,3 +110,55 @@ def sync_reverse_route(route):
     reverse.destination = route.origin
     reverse.estimated_duration = route.estimated_duration
     reverse.save()
+    
+    
+def sync_reverse_route_stops(forward_route):
+    """
+    Sync route stops from forward route to reverse route.
+    When forward route stops change, reverse route stops are updated to match (in reverse order).
+    """
+    from .models import RouteStop, RouteSegment
+    
+    if not forward_route or forward_route.is_reverse:
+        return
+    
+    reverse_route = forward_route.reverse_route
+    if not reverse_route:
+        return
+    
+    # Get forward stops in order
+    forward_stops = list(forward_route.stops.order_by('order'))
+    
+    if not forward_stops:
+        # Delete all reverse stops if no forward stops
+        reverse_route.stops.all().delete()
+        return
+    
+    # Delete all reverse stops and recreate in reverse order
+    reverse_route.stops.all().delete()
+    
+    # Create reverse stops (reversed order)
+    reverse_stops_map = {}
+    for index, fwd_stop in enumerate(reversed(forward_stops), 1):
+        rev_stop = RouteStop.objects.create(
+            route=reverse_route,
+            name=fwd_stop.name,
+            order=index
+        )
+        reverse_stops_map[fwd_stop.uid] = rev_stop
+    
+    # Sync segments (if any exist)
+    forward_segments = list(forward_route.segments.select_related('from_stop', 'to_stop').order_by('from_stop__order'))
+    
+    if forward_segments:
+        # Delete reverse segments
+        reverse_route.segments.all().delete()
+        
+        # Create reverse segments (in reverse order)
+        for segment in reversed(forward_segments):
+            RouteSegment.objects.create(
+                route=reverse_route,
+                from_stop=reverse_stops_map[segment.to_stop.uid],
+                to_stop=reverse_stops_map[segment.from_stop.uid],
+                price=segment.price
+            )

@@ -1,0 +1,275 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Create Route{% endblock %}
+
+{% block page_title %}Create New Route{% endblock %}
+{% block page_sub_title %}Add a new bus route with basic information{% endblock %}
+
+{% block actions %}
+<li>
+    <a href="{% url 'routes-index' %}" class="btn btn-white btn-dim btn-outline-primary">
+        <em class="icon ni ni-arrow-left"></em>
+        <span>Back</span>
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 28px 32px;
+    }
+
+    .form-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #364a63;
+        margin: 0 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #8094ae;
+        letter-spacing: .4px;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 13px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #6576ff;
+        box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: #b8c4d1;
+    }
+
+    .error-message {
+        font-size: 12px;
+        color: #e85347;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .help-text {
+        font-size: 11px;
+        color: #8094ae;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 28px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #6576ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .btn-secondary {
+        background: #f0f2f5;
+        color: #364a63;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .form-hint {
+        background: #f8fafc;
+        border-left: 3px solid #6576ff;
+        padding: 12px 14px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #364a63;
+    }
+
+    .form-hint em {
+        color: #6576ff;
+        font-style: normal;
+        font-weight: 600;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .errorlist li {
+        background: #fde8e8;
+        border: 1px solid #f9b8b8;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: #7e2424;
+    }
+
+    .non-field-errors {
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="col-12 col-lg-8 col-xl-6">
+    <div class="form-card">
+        
+        {# Display non-field errors #}
+        {% if form.non_field_errors %}
+        <div class="non-field-errors">
+            {% for error in form.non_field_errors %}
+            <div style="background: #fde8e8; border: 1px solid #f9b8b8; border-radius: 6px; padding: 12px; font-size: 12px; color: #7e2424; margin-bottom: 16px;">
+                <em class="icon ni ni-alert-circle" style="color: #e85347;"></em> {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h3 class="form-section-title">
+            <em class="icon ni ni-map-pin" style="color: #6576ff; font-size: 16px;"></em>
+            Route Information
+        </h3>
+
+        <div class="form-hint">
+            <em>💡</em> Create a new route with basic information. You'll add stops and pricing on the next page.
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {# Route Name #}
+            <div class="form-group">
+                <label class="form-label" for="{{ form.name.id_for_label }}">
+                    {{ form.name.label }}
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                    <span class="error-message"><em class="icon ni ni-alert-circle"></em> {{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+                <span class="help-text">e.g. "Harare to Bulawayo Express"</span>
+            </div>
+
+            {# Origin #}
+            <div class="form-group">
+                <label class="form-label" for="{{ form.origin.id_for_label }}">
+                    {{ form.origin.label }}
+                </label>
+                {{ form.origin }}
+                {% if form.origin.errors %}
+                    {% for error in form.origin.errors %}
+                    <span class="error-message"><em class="icon ni ni-alert-circle"></em> {{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+                <span class="help-text">Starting city or location</span>
+            </div>
+
+            {# Destination #}
+            <div class="form-group">
+                <label class="form-label" for="{{ form.destination.id_for_label }}">
+                    {{ form.destination.label }}
+                </label>
+                {{ form.destination }}
+                {% if form.destination.errors %}
+                    {% for error in form.destination.errors %}
+                    <span class="error-message"><em class="icon ni ni-alert-circle"></em> {{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+                <span class="help-text">Final destination city</span>
+            </div>
+
+            {# Estimated Duration #}
+            <div class="form-group">
+                <label class="form-label" for="{{ form.estimated_duration.id_for_label }}">
+                    {{ form.estimated_duration.label }}
+                </label>
+                {{ form.estimated_duration }}
+                {% if form.estimated_duration.errors %}
+                    {% for error in form.estimated_duration.errors %}
+                    <span class="error-message"><em class="icon ni ni-alert-circle"></em> {{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+                <span class="help-text">Approximate travel time (HH:MM)</span>
+            </div>
+
+            {# Actions #}
+            <div class="form-actions">
+                <a href="{% url 'routes-index' %}" class="btn btn-secondary">
+                    <em class="icon ni ni-arrow-left"></em> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <em class="icon ni ni-plus"></em> Create Route
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# Help Section #}
+    <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <h4 style="font-size: 12px; font-weight: 700; color: #364a63; margin: 0 0 12px; text-transform: uppercase;">What Happens Next?</h4>
+        <ol style="margin: 0; padding-left: 18px; font-size: 12px; color: #8094ae; line-height: 1.8;">
+            <li>Create the route with basic info</li>
+            <li>Get redirected to route detail page</li>
+            <li>Add stops (with drag-drop reorder)</li>
+            <li>Add pricing segments between stops</li>
+            <li>Reverse route auto-created & synced</li>
+        </ol>
+    </div>
+</div>
+
+{% endblock %}
