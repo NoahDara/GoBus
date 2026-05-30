@@ -1,7 +1,7 @@
 # buses/admin.py
 
 from django.contrib import admin
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe
 from django.db.models import Count
 from .models import Bus, Seat, Route, RouteStop, RouteSegment, Schedule
 
@@ -132,14 +132,14 @@ class BusAdmin(admin.ModelAdmin):
                 '<strong style="color: green;">{}</strong>',
                 obj.driver.get_full_name()
             )
-        return format_html('<span style="color: orange;">Not assigned</span>')
+        return mark_safe('<span style="color: orange;">Not assigned</span>')
     assigned_driver.short_description = 'Driver'
     
     def seat_status(self, obj):
         """Show seat layout status"""
         total_seats = obj.seats.count()
         if total_seats == 0:
-            return format_html('<span style="color: red;">⚠️ No seats</span>')
+            return mark_safe('<span style="color: red;">⚠️ No seats</span>')
         return format_html(
             '<strong>{}</strong> seats',
             total_seats
@@ -162,10 +162,10 @@ class BusAdmin(admin.ModelAdmin):
             return 'No upcoming schedules'
         return format_html(
             '<ul>{}</ul>',
-            ''.join([
+            mark_safe(''.join([
                 f'<li>{s.route.name} @ {s.departure_time.strftime("%Y-%m-%d %H:%M")}</li>'
                 for s in schedules
-            ])
+            ]))
         )
     get_schedules.short_description = 'Upcoming Trips'
     
@@ -263,10 +263,10 @@ class RouteAdmin(admin.ModelAdmin):
             return 'No segments'
         return format_html(
             '<table><tr><th>From</th><th>To</th><th>Price</th></tr>{}</table>',
-            ''.join([
+            mark_safe(''.join([
                 f'<tr><td>{s.from_stop.name}</td><td>{s.to_stop.name}</td><td>${s.price}</td></tr>'
                 for s in segments
-            ])
+            ]))
         )
     get_segment_pricing.short_description = 'Segment Pricing'
 

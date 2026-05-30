@@ -39,4 +39,8 @@ urlpatterns = [
     path('schedules/<uuid:uid>/', views.ScheduleDetailView.as_view(), name='schedules-detail'),
     path('schedules/<uuid:uid>/status/', views.ScheduleStatusChangeView.as_view(), name='schedules-status'),
     path('schedules/<uuid:uid>/cancel/', views.ScheduleCancelView.as_view(), name='schedules-cancel'),
+    
+    # AJAX endpoints for dashboard modal booking
+    path('api/schedule/<uuid:schedule_uid>/', views.ScheduleDetailAjaxView.as_view(), name='api-schedule-detail'),
+    path('api/fare/', views.FareCalculateAjaxView.as_view(), name='api-fare'),
 ]

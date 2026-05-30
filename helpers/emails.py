@@ -180,3 +180,199 @@ def send_email_with_attachments(
             recipient_list=to_emails,
             html_message=html_content,
         )
+        
+        
+# helpers/emails.py
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def send_booking_confirmation_email(booking):
+    """
+    Send booking confirmation email to user
+    
+    Args:
+        booking: Booking instance
+    """
+    try:
+        user = booking.user
+        
+        context = {
+            'user': user,
+            'booking': booking,
+            'schedule': booking.schedule,
+            'route': booking.schedule.route,
+            'bus': booking.schedule.bus,
+            'seat': booking.seat,
+            'boarding_stop': booking.boarding_stop,
+            'alighting_stop': booking.alighting_stop,
+            'fare': booking.fare,
+            'booking_reference': booking.booking_reference,
+            'departure_time': booking.schedule.departure_time,
+            'site_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'http://localhost:8000',
+        }
+        
+        # Render HTML template
+        html_message = render_to_string('mail_list/booking_confirmation.html', context)
+        plain_message = render_to_string('mail_list/booking_confirmation.txt', context)
+        
+        # Send email
+        send_mail(
+            subject=f'Your GoBus Booking Confirmed - {booking.booking_reference}',
+            message=plain_message,
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        
+        logger.info(f"✅ Booking confirmation sent to {user.email} (Booking: {booking.booking_reference})")
+        return True
+    
+    except Exception as e:
+        logger.error(f"❌ Error sending booking confirmation email: {str(e)}")
+        return False
+
+
+def send_payment_confirmation_email(payment):
+    """
+    Send payment confirmation and ticket to user
+    
+    Args:
+        payment: Payment instance
+    """
+    try:
+        booking = payment.booking
+        user = payment.user
+        
+        context = {
+            'user': user,
+            'booking': booking,
+            'payment': payment,
+            'schedule': booking.schedule,
+            'route': booking.schedule.route,
+            'bus': booking.schedule.bus,
+            'seat': booking.seat,
+            'boarding_stop': booking.boarding_stop,
+            'alighting_stop': booking.alighting_stop,
+            'fare': booking.fare,
+            'booking_reference': booking.booking_reference,
+            'payment_reference': payment.payment_reference,
+            'amount_paid': payment.amount,
+            'departure_time': booking.schedule.departure_time,
+            'site_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'http://localhost:8000',
+        }
+        
+        # Render HTML template
+        html_message = render_to_string('mail_list/payment_confirmation.html', context)
+        plain_message = render_to_string('mail_list/payment_confirmation.txt', context)
+        
+        # Send email
+        send_mail(
+            subject=f'Payment Confirmed - GoBus Ticket {booking.booking_reference}',
+            message=plain_message,
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        
+        logger.info(f"✅ Payment confirmation sent to {user.email} (Payment: {payment.payment_reference})")
+        return True
+    
+    except Exception as e:
+        logger.error(f"❌ Error sending payment confirmation email: {str(e)}")
+        return False
+
+
+def send_booking_cancelled_email(booking, reason=''):
+    """
+    Send booking cancellation email
+    
+    Args:
+        booking: Booking instance
+        reason: Cancellation reason
+    """
+    try:
+        user = booking.user
+        
+        context = {
+            'user': user,
+            'booking': booking,
+            'schedule': booking.schedule,
+            'route': booking.schedule.route,
+            'booking_reference': booking.booking_reference,
+            'reason': reason or booking.cancellation_reason,
+            'site_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'http://localhost:8000',
+        }
+        
+        # Render HTML template
+        html_message = render_to_string('mail_list/booking_cancelled.html', context)
+        plain_message = render_to_string('mail_list/booking_cancelled.txt', context)
+        
+        # Send email
+        send_mail(
+            subject=f'Booking Cancelled - {booking.booking_reference}',
+            message=plain_message,
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        
+        logger.info(f"✅ Cancellation email sent to {user.email} (Booking: {booking.booking_reference})")
+        return True
+    
+    except Exception as e:
+        logger.error(f"❌ Error sending cancellation email: {str(e)}")
+        return False
+
+
+def send_refund_processed_email(payment, refund_amount):
+    """
+    Send refund processed email
+    
+    Args:
+        payment: Payment instance
+        refund_amount: Amount refunded
+    """
+    try:
+        user = payment.user
+        booking = payment.booking
+        
+        context = {
+            'user': user,
+            'booking': booking,
+            'payment': payment,
+            'refund_amount': refund_amount,
+            'booking_reference': booking.booking_reference,
+            'payment_reference': payment.payment_reference,
+            'site_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'http://localhost:8000',
+        }
+        
+        # Render HTML template
+        html_message = render_to_string('mail_list/refund_processed.html', context)
+        plain_message = render_to_string('mail_list/refund_processed.txt', context)
+        
+        # Send email
+        send_mail(
+            subject=f'Refund Processed - ${refund_amount}',
+            message=plain_message,
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        
+        logger.info(f"✅ Refund email sent to {user.email} (Amount: ${refund_amount})")
+        return True
+    
+    except Exception as e:
+        logger.error(f"❌ Error sending refund email: {str(e)}")
+        return False

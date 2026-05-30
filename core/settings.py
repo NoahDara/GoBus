@@ -315,3 +315,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8000',
     'https://yourdomain.com',
 ]
+
+PAYNOW_API_KEY = config("PAYNOW_API_KEY", default="")
+PAYNOW_SECRET = config("PAYNOW_SECRET", default="")
+PAYNOW_MERCHANT_ID = config("PAYNOW_MERCHANT_ID", default="")
+SITE_URL = 'http://localhost:8000'

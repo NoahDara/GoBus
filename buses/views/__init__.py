@@ -32,3 +32,8 @@ from .schedules import (
     ScheduleCancelView,
     ScheduleStatusChangeView
 )
+
+from .ajax import (
+    ScheduleDetailAjaxView,
+    FareCalculateAjaxView,
+)

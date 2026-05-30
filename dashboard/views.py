@@ -9,6 +9,10 @@ from django.db.models import Count, Sum, Q
 from django.utils import timezone
 import logging
 
+from bookings.models import Booking
+from buses.models import Schedule
+from payments.models import Payment
+
 logger = logging.getLogger(__name__)
 
 
@@ -286,100 +290,93 @@ class DriverDashboardView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class PassengerDashboardView(TemplateView):
     """
-    Passenger Dashboard
-    Shows user's bookings, upcoming trips, and travel history.
+    SIMPLIFIED Passenger Dashboard
+    
+    Shows:
+    1. User's upcoming trips (bookings)
+    2. Available schedules (with Book button)
+    3. Spending summary
+    
+    Booking flow happens via AJAX modal on this page
     """
     template_name = 'dashboard/passenger.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        try:
-            from bookings.models import Booking
-            from payments.models import Payment
-        except ImportError:
-            return context
-        
         user = self.request.user
         now = timezone.now()
         today = now.date()
         
         # ════════════════════════════════════════════════════════════════
-        # BOOKINGS
+        # USER'S UPCOMING BOOKINGS (Confirmed trips)
         # ════════════════════════════════════════════════════════════════
         
-        all_bookings = Booking.objects.filter(user=user).order_by('-created')
-        
-        # Upcoming bookings
         context['upcoming_bookings'] = Booking.objects.filter(
             user=user,
             status='confirmed',
             schedule__departure_time__gte=now
+        ).select_related(
+            'schedule', 'schedule__route', 'schedule__bus',
+            'boarding_stop', 'alighting_stop', 'seat'
         ).order_by('schedule__departure_time')[:5]
         
-        # Past bookings (completed trips)
-        context['past_bookings'] = Booking.objects.filter(
-            user=user,
-            schedule__departure_time__lt=now
-        ).order_by('-schedule__departure_time')[:5]
+        # ════════════════════════════════════════════════════════════════
+        # AVAILABLE SCHEDULES (For booking)
+        # ════════════════════════════════════════════════════════════════
         
-        # Pending bookings (awaiting payment)
+        context['available_schedules'] = Schedule.objects.filter(
+            departure_time__gte=now,
+            status='scheduled'
+        ).select_related(
+            'bus', 'route'
+        ).annotate(
+            booked_seats=Count('bookings')
+        ).order_by('departure_time')[:10]
+        
+        # ════════════════════════════════════════════════════════════════
+        # PENDING PAYMENTS
+        # ════════════════════════════════════════════════════════════════
+        
         context['pending_bookings'] = Booking.objects.filter(
             user=user,
             status='pending'
+        ).select_related(
+            'schedule', 'schedule__route'
         )
         
-        context['total_bookings'] = all_bookings.count()
-        context['confirmed_bookings'] = Booking.objects.filter(
-            user=user,
-            status='confirmed'
-        ).count()
-        
         # ════════════════════════════════════════════════════════════════
-        # PAYMENT & SPENDING
+        # SPENDING STATS
         # ════════════════════════════════════════════════════════════════
         
-        payments = Payment.objects.filter(user=user)
-        context['total_spent'] = sum(p.amount for p in payments.filter(status='paid'))
-        context['pending_payments'] = sum(p.amount for p in payments.filter(status='pending'))
+        payments = Payment.objects.filter(user=user, status='paid')
+        context['total_spent'] = sum(p.amount for p in payments)
         
-        # This month spending
+        # This month
         month_start = today.replace(day=1)
         context['spent_this_month'] = sum(
-            p.amount for p in payments.filter(
-                status='paid',
-                confirmed_at__date__gte=month_start
+            p.amount for p in payments.filter(confirmed_at__date__gte=month_start)
+        )
+        
+        # Pending
+        context['pending_amount'] = sum(
+            p.amount for p in Payment.objects.filter(
+                user=user, 
+                status='pending'
             )
         )
         
         # ════════════════════════════════════════════════════════════════
-        # TRAVEL STATISTICS
+        # COMPLETED TRIPS STATS
         # ════════════════════════════════════════════════════════════════
         
-        completed_bookings = Booking.objects.filter(
+        completed = Booking.objects.filter(
             user=user,
             schedule__departure_time__lt=now
         )
-        context['total_trips'] = completed_bookings.count()
-        
-        # Get unique routes traveled
-        context['routes_traveled'] = completed_bookings.values(
-            'schedule__route__name'
+        context['total_trips'] = completed.count()
+        context['routes_traveled'] = completed.values(
+            'schedule__route'
         ).distinct().count()
-        
-        # ════════════════════════════════════════════════════════════════
-        # SAVED INFORMATION
-        # ════════════════════════════════════════════════════════════════
-        
-        # Frequently used routes
-        frequent_routes = completed_bookings.values(
-            'schedule__route__name',
-            'schedule__route__origin',
-            'schedule__route__destination'
-        ).annotate(
-            count=Count('uid')
-        ).order_by('-count')[:5]
-        context['frequent_routes'] = frequent_routes
         
         logger.info(f"Passenger dashboard accessed by {user.username}")
         

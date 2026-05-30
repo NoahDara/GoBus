@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoBus Payment Confirmed</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #364a63;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .header {
+            background: linear-gradient(135deg, #1ee0ac 0%, #00b894 100%);
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .checkmark {
+            font-size: 48px;
+            margin-top: 16px;
+        }
+        .content {
+            padding: 32px 24px;
+        }
+        .greeting {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #8094ae;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .label {
+            color: #8094ae;
+            font-weight: 600;
+        }
+        .value {
+            color: #364a63;
+            font-weight: 700;
+        }
+        .amount-box {
+            background: linear-gradient(135deg, #1ee0ac 0%, #00b894 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .amount-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+        .amount-value {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .receipt-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+        .receipt-label {
+            color: #8094ae;
+        }
+        .receipt-value {
+            font-weight: 700;
+            color: #364a63;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #6576ff;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .cta-button:hover {
+            background: #5568d3;
+        }
+        .highlight {
+            background: #e2f8f2;
+            border-left: 4px solid #1ee0ac;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .footer {
+            background: #f8fafc;
+            padding: 20px 24px;
+            font-size: 12px;
+            color: #8094ae;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {# HEADER #}
+        <div class="header">
+            <div class="logo">🚌 GoBus</div>
+            <div class="title">Payment Confirmed!</div>
+            <div class="subtitle">Your booking is now active</div>
+            <div class="checkmark">✓</div>
+        </div>
+
+        {# CONTENT #}
+        <div class="content">
+            <div class="greeting">Hello {{ user.first_name }},</div>
+
+            <p>Your payment has been successfully received! Your booking is now confirmed and your ticket is ready.</p>
+
+            {# PAYMENT INFO #}
+            <div class="section">
+                <div class="section-title">💳 Payment Details</div>
+                <div class="amount-box">
+                    <div class="amount-label">Amount Paid</div>
+                    <div class="amount-value">${{ amount_paid }}</div>
+                </div>
+                <div class="receipt-box">
+                    <div class="receipt-row">
+                        <span class="receipt-label">Payment Reference:</span>
+                        <span class="receipt-value">{{ payment_reference }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Booking Reference:</span>
+                        <span class="receipt-value">{{ booking_reference }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Confirmation Time:</span>
+                        <span class="receipt-value">Just now</span>
+                    </div>
+                </div>
+            </div>
+
+            {# BOOKING DETAILS #}
+            <div class="section">
+                <div class="section-title">📋 Your Booking</div>
+                <div class="row">
+                    <span class="label">Route:</span>
+                    <span class="value">{{ route.origin }} → {{ route.destination }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Date:</span>
+                    <span class="value">{{ departure_time|date:"M d, Y H:i" }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Bus:</span>
+                    <span class="value">{{ bus.bus_number }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Seat:</span>
+                    <span class="value">{{ seat.row }}{{ seat.seat_number }}</span>
+                </div>
+            </div>
+
+            {# WHAT'S NEXT #}
+            <div class="highlight">
+                <strong style="color: #0a5e49; display: block; margin-bottom: 8px;">✓ What's Next?</strong>
+                <ul style="margin: 0; padding-left: 20px; font-size: 12px;">
+                    <li>Download your ticket (below)</li>
+                    <li>Save your booking reference</li>
+                    <li>Arrive 15 minutes early</li>
+                    <li>Have a safe trip!</li>
+                </ul>
+            </div>
+
+            {# CTA BUTTON #}
+            <a href="{{ site_url }}/bookings/{{ booking.uid }}/" class="cta-button">
+                📄 Download Your Ticket
+            </a>
+
+            {# SUPPORT #}
+            <p style="text-align: center; font-size: 12px; color: #8094ae; margin-top: 20px;">
+                Need help? <a href="mailto:support@gobus.co.zw" style="color: #6576ff; text-decoration: none;">Contact support</a>
+            </p>
+        </div>
+
+        {# FOOTER #}
+        <div class="footer">
+            <p>🚌 GoBus - Your Reliable Bus Transport Partner</p>
+            <p style="margin-top: 8px;">Payment Ref: <strong>{{ payment_reference }}</strong></p>
+            <p style="margin-top: 8px; opacity: 0.7;">Thank you for your business!</p>
+        </div>
+    </div>
+</body>
+</html>

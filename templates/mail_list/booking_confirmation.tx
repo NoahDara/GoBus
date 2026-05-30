@@ -1,0 +1,50 @@
+GoBus - Booking Confirmation
+========================================
+
+Hello {{ user.first_name }},
+
+Great news! Your bus booking has been confirmed.
+
+BOOKING REFERENCE: {{ booking_reference }}
+
+TRIP DETAILS
+============
+From:        {{ route.origin }}
+To:          {{ route.destination }}
+Date:        {{ departure_time|date:"M d, Y" }}
+Time:        {{ departure_time|date:"H:i" }}
+Bus:         {{ bus.bus_number }}
+
+YOUR STOPS
+==========
+Boarding:    {{ boarding_stop.name }}
+Alighting:   {{ alighting_stop.name }}
+
+SEAT & FARE
+===========
+Seat:        {{ seat.row }}{{ seat.seat_number }}
+Total Fare:  ${{ fare }}
+
+IMPORTANT
+=========
+- Please arrive 15 minutes before departure
+- Bring a valid ID for verification
+- Cancellations can be made up to 24 hours before departure
+- Your seat is reserved and non-transferable
+
+NEXT STEPS
+==========
+1. Check your email for your ticket reference
+2. Screenshot or download your ticket
+3. Present it at the boarding point
+4. Have a safe trip!
+
+View your ticket online:
+{{ site_url }}/bookings/{{ booking.uid }}/
+
+SUPPORT
+=======
+Questions? Contact support@gobus.co.zw
+
+Thank you for booking with GoBus!
+Your reliable bus transport partner.

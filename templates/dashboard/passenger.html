@@ -2,24 +2,8 @@
 {% load static %}
 
 {% block title %}My Dashboard{% endblock %}
-
 {% block page_title %}My Dashboard{% endblock %}
-{% block page_sub_title %}Manage your trips and bookings{% endblock %}
-
-{% block actions %}
-<li>
-    <a href="#" class="btn btn-white btn-dim btn-outline-primary">
-        <em class="icon ni ni-download-cloud"></em>
-        <span>Export</span>
-    </a>
-</li>
-<li class="nk-block-tools-opt">
-    <a href="#" class="btn btn-primary">
-        <em class="icon ni ni-plus"></em>
-        <span>Book a Trip</span>
-    </a>
-</li>
-{% endblock %}
+{% block page_sub_title %}Your trips and available journeys{% endblock %}
 
 {% block content %}
 
@@ -27,7 +11,7 @@
     /* ── STAT CARDS ── */
     .stat-card {
         border-radius: 12px;
-        padding: 18px 20px;
+        padding: 20px;
         display: flex;
         align-items: flex-start;
         gap: 14px;
@@ -39,352 +23,243 @@
     .stat-card.red   { background: #fde8e8; border: 1px solid #f9b8b8; }
 
     .stat-icon {
-        width: 42px;
-        height: 42px;
+        width: 48px;
+        height: 48px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
-        font-size: 20px;
+        font-size: 24px;
         color: #fff;
+        flex-shrink: 0;
     }
 
-    .stat-card.blue  .stat-icon { background: #6576ff; }
-    .stat-card.green .stat-icon { background: #1ee0ac; }
-    .stat-card.amber .stat-icon { background: #f4bd0e; }
-    .stat-card.red   .stat-icon { background: #e85347; }
+    .stat-card.blue .stat-icon   { background: #6576ff; }
+    .stat-card.green .stat-icon  { background: #1ee0ac; }
+    .stat-card.amber .stat-icon  { background: #f4bd0e; }
+    .stat-card.red .stat-icon    { background: #e85347; }
 
-    .stat-label {
-        font-size: 11px;
+    .stat-text h4 {
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: .5px;
-        margin-bottom: 3px;
+        margin: 0 0 6px 0;
+        letter-spacing: 0.5px;
     }
 
-    .stat-card.blue  .stat-label { color: #4050b5; }
-    .stat-card.green .stat-label { color: #0d7a60; }
-    .stat-card.amber .stat-label { color: #8a6200; }
-    .stat-card.red   .stat-label { color: #a33030; }
+    .stat-card.blue .stat-text h4   { color: #4050b5; }
+    .stat-card.green .stat-text h4  { color: #0d7a60; }
+    .stat-card.amber .stat-text h4  { color: #8a6200; }
+    .stat-card.red .stat-text h4    { color: #a33030; }
 
     .stat-value {
-        font-size: 22px;
+        font-size: 28px;
         font-weight: 700;
-        line-height: 1.2;
-        margin-bottom: 3px;
     }
 
-    .stat-card.blue  .stat-value { color: #2d3aaa; }
-    .stat-card.green .stat-value { color: #0a5e49; }
-    .stat-card.amber .stat-value { color: #6b4a00; }
-    .stat-card.red   .stat-value { color: #7e2424; }
+    .stat-card.blue .stat-value   { color: #2d3aaa; }
+    .stat-card.green .stat-value  { color: #0a5e49; }
+    .stat-card.amber .stat-value  { color: #6b4a00; }
+    .stat-card.red .stat-value    { color: #7e2424; }
 
-    .stat-sub { font-size: 12px; }
+    .stat-sub {
+        font-size: 12px;
+        margin-top: 4px;
+    }
 
-    .stat-card.blue  .stat-sub { color: #5060cc; }
-    .stat-card.green .stat-sub { color: #0d7a60; }
-    .stat-card.amber .stat-sub { color: #8a6200; }
-    .stat-card.red   .stat-sub { color: #a33030; }
+    .stat-card.blue .stat-sub   { color: #5060cc; }
+    .stat-card.green .stat-sub  { color: #0d7a60; }
+    .stat-card.amber .stat-sub  { color: #8a6200; }
+    .stat-card.red .stat-sub    { color: #a33030; }
 
-    /* ── SECTION CARD ── */
-    .nk-card {
-        background: #fff;
+    /* ── SECTION ── */
+    .section {
+        background: white;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 22px 24px;
+        padding: 24px;
+        margin-bottom: 24px;
     }
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 18px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .section-header h3 {
+    .section-title {
         font-size: 15px;
         font-weight: 700;
         color: #364a63;
-        margin: 0;
+        margin: 0 0 16px 0;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    .section-header h3 em { font-size: 18px; color: #6576ff; }
+    .section-title em { font-size: 20px; color: #6576ff; }
 
-    /* ── TRIP CARDS ── */
-    .trip-card {
+    /* ── SCHEDULE CARD (Available for booking) ── */
+    .schedule-card {
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         padding: 16px;
-        margin-bottom: 10px;
-        border-left: 3px solid #6576ff;
-        transition: box-shadow .2s ease, transform .2s ease;
+        margin-bottom: 12px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 16px;
+        align-items: center;
     }
 
-    .trip-card:last-child { margin-bottom: 0; }
-
-    .trip-card:hover {
-        box-shadow: 0 4px 16px rgba(0,0,0,.07);
-        transform: translateY(-2px);
+    .schedule-card:hover {
+        border-color: #6576ff;
+        background: #f8fafc;
     }
 
-    .trip-header {
+    .schedule-route h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #364a63;
+        margin: 0 0 4px 0;
+    }
+
+    .schedule-route p {
+        font-size: 12px;
+        color: #8094ae;
+        margin: 0;
+    }
+
+    .schedule-info {
         display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 4px;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
     }
 
-    .trip-route-name {
-        font-size: 14px;
+    .schedule-info-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: #8094ae;
+        font-weight: 700;
+    }
+
+    .schedule-info-value {
         font-weight: 700;
         color: #364a63;
     }
 
-    .trip-route-meta {
-        font-size: 12px;
-        color: #8094ae;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin-bottom: 12px;
-    }
-
-    .trip-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: #e2f8f2;
-        color: #0a5e49;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 20px;
-        white-space: nowrap;
-    }
-
-    .trip-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        padding: 12px 0;
-        border-top: 1px solid #e2e8f0;
-        border-bottom: 1px solid #e2e8f0;
-        margin-bottom: 12px;
+    .schedule-availability {
         text-align: center;
     }
 
-    .trip-cell-label {
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: .4px;
+    .avail-count {
+        font-size: 20px;
         font-weight: 700;
-        color: #8094ae;
-        margin-bottom: 3px;
+        color: #1ee0ac;
     }
 
-    .trip-cell-val {
-        font-size: 13px;
-        font-weight: 700;
-        color: #364a63;
-    }
-
-    .trip-cell-val.mono {
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        color: #6576ff;
-    }
-
-    .trip-cell-sub {
+    .avail-label {
         font-size: 11px;
         color: #8094ae;
         margin-top: 2px;
     }
 
+    .btn-book-schedule {
+        background: #6576ff;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .btn-book-schedule:hover {
+        background: #5568d3;
+    }
+
+    /* ── TRIP CARD (User's bookings) ── */
+    .trip-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 12px;
+        border-left: 4px solid #1ee0ac;
+    }
+
+    .trip-card:hover {
+        background: #f8fafc;
+    }
+
+    .trip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .trip-route {
+        font-size: 14px;
+        font-weight: 700;
+        color: #364a63;
+    }
+
+    .trip-badge {
+        background: #e2f8f2;
+        color: #0a5e49;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .trip-details {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 12px;
+        font-size: 12px;
+    }
+
+    .trip-detail-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: #8094ae;
+        font-weight: 700;
+    }
+
+    .trip-detail-value {
+        font-weight: 700;
+        color: #364a63;
+    }
+
     .trip-footer {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
     }
 
     .trip-stops {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        font-size: 12px;
         color: #8094ae;
     }
 
-    .trip-stops strong { color: #364a63; font-weight: 600; }
-
-    /* ── PENDING PAYMENTS ── */
-    .pending-item {
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 13px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        transition: background .15s;
-    }
-
-    .pending-item:last-child { margin-bottom: 0; }
-    .pending-item:hover { background: #f8fafc; }
-
-    .pending-name {
-        font-size: 13px;
-        font-weight: 700;
+    .trip-stops strong {
         color: #364a63;
-        margin-bottom: 4px;
+        display: block;
     }
 
-    .pending-sub {
-        font-size: 12px;
-        color: #8094ae;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .pending-price {
-        font-size: 17px;
-        font-weight: 700;
-        color: #a33030;
-        text-align: right;
-        margin-bottom: 5px;
-    }
-
-    .btn-pay {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 4px 10px;
+    .btn-view-ticket {
+        background: #e8ecff;
+        color: #6576ff;
+        padding: 6px 12px;
+        border: none;
         border-radius: 6px;
-        border: 1px solid #f9b8b8;
-        background: transparent;
-        color: #a33030;
+        font-weight: 700;
+        font-size: 11px;
         cursor: pointer;
-        transition: background .15s;
     }
 
-    .btn-pay:hover { background: rgba(232,83,71,.06); }
-
-    /* ── INNER SECTION DIVIDER ── */
-    .inner-section-title {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .4px;
-        color: #8094ae;
-        margin: 16px 0 10px;
-        padding-top: 16px;
-        border-top: 1px solid #e2e8f0;
-    }
-
-    /* ── STAT MINI ── */
-    .stat-mini {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 9px 12px;
-        background: #f8fafc;
-        border-radius: 8px;
-        margin-bottom: 7px;
-    }
-
-    .stat-mini:last-child { margin-bottom: 0; }
-
-    .stat-mini-label {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .4px;
-        color: #8094ae;
-    }
-
-    .stat-mini-val { font-size: 17px; font-weight: 700; }
-
-    /* ── PROGRESS ── */
-    .progress-bar {
-        height: 5px;
-        background: #e2e8f0;
-        border-radius: 10px;
-        overflow: hidden;
-        margin: 8px 0 4px;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: #6576ff;
-        border-radius: 10px;
-    }
-
-    .progress-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        color: #8094ae;
-    }
-
-    .spending-total {
-        display: flex;
-        justify-content: space-between;
-        font-size: 13px;
-        padding-top: 12px;
-        margin-top: 12px;
-        border-top: 1px solid #e2e8f0;
-        color: #364a63;
-    }
-
-    /* ── HISTORY TABLE ── */
-    .history-table { width: 100%; border-collapse: collapse; }
-
-    .history-table thead tr {
-        background: #f8fafc;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .history-table th {
-        padding: 10px 14px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .4px;
-        color: #8094ae;
-    }
-
-    .history-table td {
-        padding: 12px 14px;
-        border-bottom: 1px solid #e2e8f0;
-        font-size: 13px;
-        color: #364a63;
-    }
-
-    .history-table tbody tr:last-child td { border-bottom: none; }
-    .history-table tbody tr:hover { background: #f8fafc; }
-
-    .route-name { font-weight: 700; color: #364a63; display: block; margin-bottom: 2px; }
-    .route-path { font-size: 11px; color: #8094ae; }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 3px 9px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        background: #e2f8f2;
-        color: #0a5e49;
+    .btn-view-ticket:hover {
+        background: #d8e0ff;
     }
 
     /* ── EMPTY STATE ── */
@@ -394,51 +269,258 @@
         color: #8094ae;
     }
 
-    .empty-state em {
-        font-size: 38px;
+    .empty-icon {
+        font-size: 48px;
         display: block;
-        margin-bottom: 10px;
-        opacity: .35;
+        margin-bottom: 12px;
+        opacity: 0.35;
     }
 
-    .empty-state p {
+    .empty-title {
         font-size: 14px;
         font-weight: 700;
         color: #364a63;
+        margin-bottom: 4px;
+    }
+
+    /* ── BOOKING MODAL ── */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        font-size: 18px;
+        font-weight: 700;
+        color: #364a63;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #8094ae;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #364a63;
+        margin-bottom: 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: inherit;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #6576ff;
+        background: #f8fafc;
+    }
+
+    /* ── SEATS — ROW-GROUPED ── */
+    .seats-wrapper {
+        padding: 14px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin: 4px 0;
+    }
+
+    .seat-row-group {
+        margin-bottom: 14px;
+    }
+
+    .seat-row-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .seat-row-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #8094ae;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         margin-bottom: 6px;
     }
 
-    .empty-state small { font-size: 12px; display: block; margin-bottom: 16px; }
+    .seat-row-seats {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .seat {
+        width: 48px;
+        height: 48px;
+        border: 1px solid #d2dce6;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        padding: 0;
+    }
+
+    .seat-num {
+        font-size: 13px;
+        font-weight: 700;
+        color: #364a63;
+    }
+
+    .seat-sub {
+        font-size: 10px;
+        color: #8094ae;
+        margin-top: 1px;
+    }
+
+    .seat:hover:not(.booked) {
+        border-color: #6576ff;
+        background: #e8ecff;
+        transform: scale(1.05);
+    }
+
+    .seat:hover:not(.booked) .seat-num,
+    .seat:hover:not(.booked) .seat-sub {
+        color: #6576ff;
+    }
+
+    .seat.selected {
+        background: #6576ff;
+        border-color: #6576ff;
+        box-shadow: 0 2px 8px rgba(101, 118, 255, 0.3);
+    }
+
+    .seat.selected .seat-num,
+    .seat.selected .seat-sub {
+        color: white;
+    }
+
+    .seat.booked {
+        background: #fde8e8;
+        border-color: #f9b8b8;
+        cursor: not-allowed;
+    }
+
+    .seat.booked .seat-num,
+    .seat.booked .seat-sub {
+        color: #a33030;
+    }
+
+    .seats-legend {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+        font-size: 11px;
+        color: #8094ae;
+        align-items: center;
+    }
+
+    .legend-swatch {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+
+    .btn-confirm {
+        width: 100%;
+        padding: 12px;
+        background: #6576ff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .btn-confirm:hover {
+        background: #5568d3;
+    }
+
+    .btn-confirm:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-        .trip-grid { grid-template-columns: 1fr; }
-        .trip-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
-        .pending-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .schedule-card {
+            grid-template-columns: 1fr;
+        }
+
+        .trip-details {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
     }
 </style>
 
-{# ── STAT CARDS ── #}
+{# ── STATS ── #}
 <div class="col-sm-6 col-xl-3">
     <div class="stat-card blue">
-        <div class="stat-icon"><em class="icon ni ni-calendar-check"></em></div>
-        <div>
-            <div class="stat-label">Upcoming trips</div>
+        <div class="stat-icon">📅</div>
+        <div class="stat-text">
+            <h4>Upcoming Trips</h4>
             <div class="stat-value">{{ upcoming_bookings|length }}</div>
-            {% if upcoming_bookings %}
-            <div class="stat-sub">Next: {{ upcoming_bookings.0.schedule.departure_time|date:"M d" }}</div>
-            {% else %}
-            <div class="stat-sub">No scheduled trips</div>
-            {% endif %}
+            <div class="stat-sub">{% if upcoming_bookings %}Next: {{ upcoming_bookings.0.schedule.departure_time|date:"M d" }}{% else %}None scheduled{% endif %}</div>
         </div>
     </div>
 </div>
 
 <div class="col-sm-6 col-xl-3">
     <div class="stat-card green">
-        <div class="stat-icon"><em class="icon ni ni-check-circle"></em></div>
-        <div>
-            <div class="stat-label">Completed trips</div>
+        <div class="stat-icon">✓</div>
+        <div class="stat-text">
+            <h4>Completed Trips</h4>
             <div class="stat-value">{{ total_trips }}</div>
             <div class="stat-sub">{{ routes_traveled }} unique routes</div>
         </div>
@@ -447,9 +529,9 @@
 
 <div class="col-sm-6 col-xl-3">
     <div class="stat-card amber">
-        <div class="stat-icon"><em class="icon ni ni-wallet"></em></div>
-        <div>
-            <div class="stat-label">Total spent</div>
+        <div class="stat-icon">💰</div>
+        <div class="stat-text">
+            <h4>Total Spent</h4>
             <div class="stat-value">${{ total_spent|floatformat:0 }}</div>
             <div class="stat-sub">${{ spent_this_month|floatformat:0 }} this month</div>
         </div>
@@ -458,228 +540,416 @@
 
 <div class="col-sm-6 col-xl-3">
     <div class="stat-card red">
-        <div class="stat-icon"><em class="icon ni ni-cc-alt2"></em></div>
-        <div>
-            <div class="stat-label">Pending payments</div>
-            <div class="stat-value">${{ pending_payments|floatformat:0 }}</div>
+        <div class="stat-icon">💳</div>
+        <div class="stat-text">
+            <h4>Pending Payments</h4>
+            <div class="stat-value">${{ pending_amount|floatformat:0 }}</div>
             <div class="stat-sub">{{ pending_bookings|length }} awaiting</div>
         </div>
     </div>
 </div>
 
-{# ── UPCOMING TRIPS (col-6) + PENDING PAYMENTS (col-6) ── #}
+{# ── UPCOMING TRIPS (Left) + PENDING PAYMENTS (Right) ── #}
 <div class="col-lg-6">
-    <div class="nk-card">
-        <div class="section-header">
-            <h3>
-                <em class="icon ni ni-flight-takeoff"></em>
-                Upcoming Trips
-            </h3>
-            <a href="#" class="btn btn-sm btn-primary">
-                <em class="icon ni ni-plus"></em>
-                <span>Book a Trip</span>
-            </a>
+    <div class="section">
+        <div class="section-title">
+            <em>🚌</em>
+            My Upcoming Trips
         </div>
 
         {% if upcoming_bookings %}
-        <div style="max-height:560px; overflow-y:auto;">
             {% for booking in upcoming_bookings %}
             <div class="trip-card">
                 <div class="trip-header">
-                    <div class="trip-route-name">
-                        {{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}
-                    </div>
-                    <span class="trip-badge">
-                        <em class="icon ni ni-check-circle"></em> Confirmed
-                    </span>
+                    <div class="trip-route">{{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</div>
+                    <span class="trip-badge">✓ Confirmed</span>
                 </div>
 
-                <div class="trip-route-meta">
-                    <em class="icon ni ni-map-pin"></em>
-                    {{ booking.schedule.route.name }}
-                </div>
-
-                <div class="trip-grid">
+                <div class="trip-details">
                     <div>
-                        <div class="trip-cell-label">Departure</div>
-                        <div class="trip-cell-val">{{ booking.schedule.departure_time|date:"M d" }}</div>
-                        <div class="trip-cell-sub">{{ booking.schedule.departure_time|date:"H:i" }}</div>
+                        <div class="trip-detail-label">Departure</div>
+                        <div class="trip-detail-value">{{ booking.schedule.departure_time|date:"M d, H:i" }}</div>
                     </div>
                     <div>
-                        <div class="trip-cell-label">Seat</div>
-                        <div class="trip-cell-val">{{ booking.seat.seat_number }}</div>
-                        <div class="trip-cell-sub">Row {{ booking.seat.row }}</div>
+                        <div class="trip-detail-label">Seat</div>
+                        <div class="trip-detail-value">{{ booking.seat.row }}{{ booking.seat.seat_number }}</div>
                     </div>
                     <div>
-                        <div class="trip-cell-label">Reference</div>
-                        <div class="trip-cell-val mono">{{ booking.booking_reference }}</div>
-                        <div class="trip-cell-sub">Keep safe</div>
+                        <div class="trip-detail-label">Reference</div>
+                        <div class="trip-detail-value" style="font-family: monospace; font-size: 11px;">{{ booking.booking_reference }}</div>
                     </div>
                 </div>
 
                 <div class="trip-footer">
                     <div class="trip-stops">
-                        <div><strong>Boarding:</strong> {{ booking.boarding_stop.name }}</div>
-                        <div><strong>Alighting:</strong> {{ booking.alighting_stop.name }}</div>
+                        <strong>From:</strong> {{ booking.boarding_stop.name }}<br>
+                        <strong>To:</strong> {{ booking.alighting_stop.name }}
                     </div>
-                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                    <button class="btn-view-ticket">View Ticket</button>
                 </div>
             </div>
             {% endfor %}
-        </div>
-
         {% else %}
         <div class="empty-state">
-            <em class="icon ni ni-calendar-x"></em>
-            <p>No upcoming trips</p>
-            <small>Plan your next journey with us</small>
-            <a href="#" class="btn btn-primary">
-                <em class="icon ni ni-plus"></em>
-                <span>Book Your First Trip</span>
-            </a>
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No upcoming trips</div>
+            <p style="font-size: 12px;">Book your next journey below</p>
         </div>
         {% endif %}
     </div>
 </div>
 
 <div class="col-lg-6">
-    <div class="nk-card">
-        {% if pending_bookings %}
-        <div class="section-header">
-            <h3>
-                <em class="icon ni ni-cc-alt2" style="color:#e85347;"></em>
-                Pending Payments
-            </h3>
-            <span style="font-size:11px;font-weight:700;color:#a33030;background:#fde8e8;padding:3px 10px;border-radius:20px;border:1px solid #f9b8b8;">
-                {{ pending_bookings|length }} Payment{{ pending_bookings|length|pluralize }}
-            </span>
+    <div class="section">
+        <div class="section-title">
+            <em>💳</em>
+            Pending Payments
         </div>
 
-        {% for booking in pending_bookings %}
-        <div class="pending-item">
-            <div>
-                <div class="pending-name">{{ booking.schedule.route.name }}</div>
-                <div class="pending-sub">
-                    <em class="icon ni ni-clock"></em>
-                    {{ booking.schedule.departure_time|date:"M d, Y H:i" }}
+        {% if pending_bookings %}
+            {% for booking in pending_bookings %}
+            <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 700; color: #364a63;">{{ booking.schedule.route.name }}</div>
+                    <div style="font-size: 12px; color: #8094ae;">{{ booking.schedule.departure_time|date:"M d, Y H:i" }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 18px; font-weight: 700; color: #a33030;">${{ booking.fare }}</div>
+                    <button class="btn-view-ticket" style="margin-top: 4px;">Pay Now</button>
                 </div>
             </div>
-            <div style="text-align:right; flex-shrink:0; padding-left:12px;">
-                <div class="pending-price">${{ booking.fare|floatformat:0 }}</div>
-                <button class="btn-pay">
-                    <em class="icon ni ni-cc-alt2"></em>
-                    Pay Now
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">✓</div>
+            <div class="empty-title">All paid up!</div>
+            <p style="font-size: 12px;">No outstanding payments</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ── AVAILABLE SCHEDULES (For booking) ── #}
+<div class="col-12">
+    <div class="section">
+        <div class="section-title">
+            <em>🚌</em>
+            Available Journeys
+        </div>
+
+        {% if available_schedules %}
+            {% for schedule in available_schedules %}
+            <div class="schedule-card">
+                <div class="schedule-route">
+                    <h3>{{ schedule.route.origin }} → {{ schedule.route.destination }}</h3>
+                    <p>{{ schedule.route.name }}</p>
+                </div>
+
+                <div class="schedule-info">
+                    <div class="schedule-info-label">📅 Date & Time</div>
+                    <div class="schedule-info-value">{{ schedule.departure_time|date:"M d, H:i" }}</div>
+                </div>
+
+                <div class="schedule-availability">
+                    <div class="avail-count">{{ schedule.available_seats }}</div>
+                    <div class="avail-label">Seats Available</div>
+                </div>
+
+                <button class="btn-book-schedule" onclick="openBookingModal('{{ schedule.uid }}', '{{ schedule.route.origin }} → {{ schedule.route.destination }}')">
+                    Book Now →
                 </button>
             </div>
-        </div>
-        {% endfor %}
-
-        {% else %}
-        <div class="section-header">
-            <h3>
-                <em class="icon ni ni-cc-alt2" style="color:#e85347;"></em>
-                Pending Payments
-            </h3>
-        </div>
-        <div class="empty-state">
-            <em class="icon ni ni-check-circle"></em>
-            <p>All payments clear</p>
-            <small>No outstanding payments</small>
-        </div>
-        {% endif %}
-
-        {# Booking Statistics #}
-        <div class="inner-section-title">Booking Statistics</div>
-
-        <div class="stat-mini">
-            <span class="stat-mini-label">Confirmed</span>
-            <span class="stat-mini-val" style="color:#6576ff;">{{ confirmed_bookings }}</span>
-        </div>
-        <div class="stat-mini">
-            <span class="stat-mini-label">Pending</span>
-            <span class="stat-mini-val" style="color:#8a6200;">{{ pending_bookings|length }}</span>
-        </div>
-        <div class="stat-mini">
-            <span class="stat-mini-label">Total bookings</span>
-            <span class="stat-mini-val" style="color:#364a63;">{{ total_bookings }}</span>
-        </div>
-
-        {# Spending Analysis #}
-        <div class="inner-section-title">Spending Analysis</div>
-
-        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px;">
-            <span style="font-size:13px; color:#8094ae;">This month</span>
-            <span style="font-size:22px; font-weight:700; color:#364a63;">${{ spent_this_month|floatformat:0 }}</span>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width:65%;"></div>
-        </div>
-        <div class="progress-labels">
-            <span>65% of budget</span>
-            <span>Budget: $200</span>
-        </div>
-        <div class="spending-total">
-            <span style="color:#8094ae;">Total all time</span>
-            <strong>${{ total_spent|floatformat:0 }}</strong>
-        </div>
-    </div>
-</div>
-
-{# ── TRAVEL HISTORY ── #}
-<div class="col-12">
-    <div class="nk-card">
-        <div class="section-header">
-            <h3>
-                <em class="icon ni ni-reload-alt"></em>
-                Travel History
-            </h3>
-            <a href="#" style="font-size:12px; font-weight:700; color:#6576ff; text-decoration:none; display:flex; align-items:center; gap:4px;">
-                View All <em class="icon ni ni-arrow-right"></em>
-            </a>
-        </div>
-
-        {% if past_bookings %}
-        <table class="history-table">
-            <thead>
-                <tr>
-                    <th>Route</th>
-                    <th>Date</th>
-                    <th>Seat</th>
-                    <th>Fare</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in past_bookings %}
-                <tr>
-                    <td>
-                        <span class="route-name">{{ booking.schedule.route.name }}</span>
-                        <span class="route-path">{{ booking.schedule.route.origin }} → {{ booking.schedule.route.destination }}</span>
-                    </td>
-                    <td>{{ booking.schedule.departure_time|date:"M d, Y" }}</td>
-                    <td>
-                        <strong>{{ booking.seat.seat_number }}</strong>
-                        <span style="color:#8094ae; font-size:11px;"> (Row {{ booking.seat.row }})</span>
-                    </td>
-                    <td><strong>${{ booking.fare|floatformat:0 }}</strong></td>
-                    <td>
-                        <span class="status-badge">
-                            <em class="icon ni ni-check"></em> Completed
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+            {% endfor %}
         {% else %}
         <div class="empty-state">
-            <em class="icon ni ni-inbox"></em>
-            <p>No travel history</p>
-            <small>Your completed trips will appear here</small>
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No available journeys</div>
+            <p style="font-size: 12px;">Check back later for new schedules</p>
         </div>
         {% endif %}
     </div>
 </div>
+
+{# ── BOOKING MODAL ── #}
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Book Your Journey</span>
+            <button class="modal-close" onclick="closeBookingModal()">✕</button>
+        </div>
+
+        <form id="bookingForm">
+            {% csrf_token %}
+            <input type="hidden" id="scheduleUid" name="schedule_uid">
+
+            {# BOARDING STOP #}
+            <div class="form-group">
+                <label class="form-label">Select Boarding Stop (From)</label>
+                <select id="boardingStop" class="form-select" onchange="updateAvailableSeats()" required>
+                    <option value="">Choose where you board...</option>
+                </select>
+            </div>
+
+            {# ALIGHTING STOP #}
+            <div class="form-group">
+                <label class="form-label">Select Alighting Stop (To)</label>
+                <select id="alightingStop" class="form-select" onchange="updateAvailableSeats()" required>
+                    <option value="">Choose where you alight...</option>
+                </select>
+            </div>
+
+            {# FARE DISPLAY #}
+            <div style="background: #e8ecff; border: 1px solid #b8c4ff; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: center;">
+                <div style="font-size: 11px; color: #6576ff; text-transform: uppercase; font-weight: 700;">Fare</div>
+                <div style="font-size: 24px; color: #2d3aaa; font-weight: 700;">$<span id="fareDisplay">0</span></div>
+            </div>
+
+            {# SEAT SELECTION #}
+            <div class="form-group">
+                <label class="form-label">Select Your Seat</label>
+                <div id="seatsGrid"></div>
+                <div class="seats-legend">
+                    <span>
+                        <span class="legend-swatch" style="background: white; border: 1px solid #d2dce6;"></span>
+                        Available
+                    </span>
+                    <span>
+                        <span class="legend-swatch" style="background: #6576ff;"></span>
+                        Selected
+                    </span>
+                    <span>
+                        <span class="legend-swatch" style="background: #fde8e8; border: 1px solid #f9b8b8;"></span>
+                        Booked
+                    </span>
+                </div>
+                <input type="hidden" id="selectedSeat" name="seat_uid" required>
+            </div>
+
+            <button type="submit" class="btn-confirm" id="submitBtn" disabled>
+                Continue to Payment →
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentScheduleData = {};
+
+    function openBookingModal(scheduleUid, routeName) {
+        console.log('🔵 openBookingModal called with:', scheduleUid, routeName);
+
+        document.getElementById('scheduleUid').value = scheduleUid;
+        document.getElementById('bookingModal').classList.add('show');
+
+        // Reset form
+        document.getElementById('bookingForm').reset();
+        document.getElementById('selectedSeat').value = '';
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('fareDisplay').textContent = '0';
+
+        fetchScheduleData(scheduleUid);
+    }
+
+    function closeBookingModal() {
+        document.getElementById('bookingModal').classList.remove('show');
+        document.getElementById('bookingForm').reset();
+        document.getElementById('selectedSeat').value = '';
+        document.getElementById('submitBtn').disabled = true;
+    }
+
+    function fetchScheduleData(scheduleUid) {
+        const url = `/buses/api/schedule/${scheduleUid}/`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentScheduleData = data;
+                    populateStopsDropdowns(data.stops);
+                    displaySeatsGrid(data.seats);
+                } else {
+                    console.error('❌ Data success is false:', data.error);
+                    alert('Error loading schedule: ' + data.error);
+                    closeBookingModal();
+                }
+            })
+            .catch(error => {
+                console.error('❌ Fetch error:', error);
+                alert('Error loading schedule');
+                closeBookingModal();
+            });
+    }
+
+    function populateStopsDropdowns(stops) {
+        const boardingSelect = document.getElementById('boardingStop');
+        const alightingSelect = document.getElementById('alightingStop');
+
+        boardingSelect.innerHTML = '<option value="">Choose where you board...</option>';
+        alightingSelect.innerHTML = '<option value="">Choose where you alight...</option>';
+
+        stops.forEach(stop => {
+            const boardingOption = document.createElement('option');
+            boardingOption.value = stop.uid;
+            boardingOption.dataset.order = stop.order;
+            boardingOption.textContent = `${stop.name} (Stop ${stop.order})`;
+            boardingSelect.appendChild(boardingOption);
+
+            const alightingOption = document.createElement('option');
+            alightingOption.value = stop.uid;
+            alightingOption.dataset.order = stop.order;
+            alightingOption.textContent = `${stop.name} (Stop ${stop.order})`;
+            alightingSelect.appendChild(alightingOption);
+        });
+    }
+
+    function displaySeatsGrid(seats) {
+        const container = document.getElementById('seatsGrid');
+        container.innerHTML = '';
+        container.className = 'seats-wrapper';
+
+        // Group seats by row number
+        const rows = {};
+        seats.forEach(seat => {
+            if (!rows[seat.row]) rows[seat.row] = [];
+            rows[seat.row].push(seat);
+        });
+
+        // Render each row group in order
+        Object.keys(rows)
+            .map(Number)
+            .sort((a, b) => a - b)
+            .forEach(rowNum => {
+                const group = document.createElement('div');
+                group.className = 'seat-row-group';
+
+                const label = document.createElement('div');
+                label.className = 'seat-row-label';
+                label.textContent = rowNum === 1 ? 'Row 1 · front' : `Row ${rowNum}`;
+                group.appendChild(label);
+
+                const rowSeats = document.createElement('div');
+                rowSeats.className = 'seat-row-seats';
+
+                rows[rowNum].forEach(seat => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'seat' + (seat.booked ? ' booked' : '');
+                    btn.disabled = seat.booked;
+                    btn.dataset.seatUid = seat.uid;
+                    btn.innerHTML = `
+                        <span class="seat-num">${seat.number}</span>
+                        <span class="seat-sub">${seat.booked ? '✕' : '○'}</span>
+                    `;
+
+                    if (!seat.booked) {
+                        btn.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            selectSeat(this);
+                        });
+                    }
+
+                    rowSeats.appendChild(btn);
+                });
+
+                group.appendChild(rowSeats);
+                container.appendChild(group);
+            });
+    }
+
+    function selectSeat(element) {
+        // Deselect previous
+        document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+
+        // Select this one
+        element.classList.add('selected');
+        document.getElementById('selectedSeat').value = element.dataset.seatUid;
+
+        checkFormComplete();
+    }
+
+    function updateAvailableSeats() {
+        const boardingSelect = document.getElementById('boardingStop');
+        const alightingSelect = document.getElementById('alightingStop');
+        const scheduleUid = document.getElementById('scheduleUid').value;
+
+        if (!boardingSelect.value || !alightingSelect.value) return;
+
+        const boardingOrder = boardingSelect.options[boardingSelect.selectedIndex].dataset.order;
+        const alightingOrder = alightingSelect.options[alightingSelect.selectedIndex].dataset.order;
+
+        if (parseInt(boardingOrder) >= parseInt(alightingOrder)) {
+            document.getElementById('fareDisplay').textContent = '0';
+            return;
+        }
+
+        const url = `/buses/api/fare/?schedule_uid=${scheduleUid}&boarding_order=${boardingOrder}&alighting_order=${alightingOrder}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('fareDisplay').textContent = data.fare.toFixed(2);
+                } else {
+                    document.getElementById('fareDisplay').textContent = '0';
+                }
+            })
+            .catch(() => {
+                document.getElementById('fareDisplay').textContent = '0';
+            });
+
+        checkFormComplete();
+    }
+
+    function checkFormComplete() {
+        const boarding = document.getElementById('boardingStop').value;
+        const alighting = document.getElementById('alightingStop').value;
+        const seat = document.getElementById('selectedSeat').value;
+        document.getElementById('submitBtn').disabled = !(boarding && alighting && seat);
+    }
+
+    // Event listeners
+    document.getElementById('boardingStop').addEventListener('change', updateAvailableSeats);
+    document.getElementById('alightingStop').addEventListener('change', updateAvailableSeats);
+
+    // Form submit
+    document.getElementById('bookingForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const scheduleUid = document.getElementById('scheduleUid').value;
+        const boardingUid = document.getElementById('boardingStop').value;
+        const alightingUid = document.getElementById('alightingStop').value;
+        const seatUid = document.getElementById('selectedSeat').value;
+
+        const formData = new FormData();
+        formData.append('schedule_uid', scheduleUid);
+        formData.append('boarding_stop_uid', boardingUid);
+        formData.append('alighting_stop_uid', alightingUid);
+        formData.append('seat_uid', seatUid);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        fetch('/bookings/create/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = response.url;
+            } else {
+                alert('Error creating booking');
+            }
+        })
+        .catch(error => {
+            alert('Error creating booking: ' + error.message);
+        });
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        const modal = document.getElementById('bookingModal');
+        if (event.target === modal) {
+            closeBookingModal();
+        }
+    };
+</script>
 
 {% endblock %}

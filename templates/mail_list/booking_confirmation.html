@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoBus Booking Confirmation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #364a63;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .header {
+            background: linear-gradient(135deg, #6576ff 0%, #5568d3 100%);
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .reference {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .content {
+            padding: 32px 24px;
+        }
+        .greeting {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #8094ae;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .label {
+            color: #8094ae;
+            font-weight: 600;
+        }
+        .value {
+            color: #364a63;
+            font-weight: 700;
+        }
+        .highlight {
+            background: #e8ecff;
+            border-left: 4px solid #6576ff;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .fare-box {
+            background: linear-gradient(135deg, #1ee0ac 0%, #00b894 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .fare-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+        .fare-amount {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #6576ff;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .cta-button:hover {
+            background: #5568d3;
+        }
+        .footer {
+            background: #f8fafc;
+            padding: 20px 24px;
+            font-size: 12px;
+            color: #8094ae;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        .qr-text {
+            text-align: center;
+            font-size: 12px;
+            color: #8094ae;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {# HEADER #}
+        <div class="header">
+            <div class="logo">🚌 GoBus</div>
+            <div class="title">Booking Confirmed!</div>
+            <div class="subtitle">Your ticket is ready</div>
+            <div class="reference">{{ booking_reference }}</div>
+        </div>
+
+        {# CONTENT #}
+        <div class="content">
+            <div class="greeting">Hello {{ user.first_name }},</div>
+
+            <p>Great news! Your bus booking has been confirmed. Below are your ticket details.</p>
+
+            {# TRIP DETAILS #}
+            <div class="section">
+                <div class="section-title">🚌 Trip Details</div>
+                <div class="row">
+                    <span class="label">From:</span>
+                    <span class="value">{{ route.origin }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">To:</span>
+                    <span class="value">{{ route.destination }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Date:</span>
+                    <span class="value">{{ departure_time|date:"M d, Y" }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Time:</span>
+                    <span class="value">{{ departure_time|date:"H:i" }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Bus Number:</span>
+                    <span class="value">{{ bus.bus_number }}</span>
+                </div>
+            </div>
+
+            {# STOPS #}
+            <div class="section">
+                <div class="section-title">🛑 Your Stops</div>
+                <div class="row">
+                    <span class="label">Boarding:</span>
+                    <span class="value">{{ boarding_stop.name }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Alighting:</span>
+                    <span class="value">{{ alighting_stop.name }}</span>
+                </div>
+            </div>
+
+            {# SEAT & FARE #}
+            <div class="section">
+                <div class="section-title">🪑 Seat & Price</div>
+                <div class="row">
+                    <span class="label">Seat:</span>
+                    <span class="value">{{ seat.row }}{{ seat.seat_number }}</span>
+                </div>
+                <div class="fare-box">
+                    <div class="fare-label">Total Fare</div>
+                    <div class="fare-amount">${{ fare }}</div>
+                </div>
+            </div>
+
+            {# IMPORTANT INFO #}
+            <div class="highlight">
+                <strong style="color: #6576ff; display: block; margin-bottom: 8px;">ℹ️ Important</strong>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                    <li>Please arrive 15 minutes before departure</li>
+                    <li>Bring a valid ID for verification</li>
+                    <li>Cancellations can be made up to 24 hours before departure</li>
+                    <li>Your seat is reserved and non-transferable</li>
+                </ul>
+            </div>
+
+            {# NEXT STEPS #}
+            <div class="section">
+                <div class="section-title">📋 Next Steps</div>
+                <p style="margin: 0 0 8px 0;">1. Check your email for your ticket reference</p>
+                <p style="margin: 0 0 8px 0;">2. Screenshot or download your ticket</p>
+                <p style="margin: 0 0 8px 0;">3. Present it at the boarding point</p>
+                <p style="margin: 0;">4. Have a safe trip!</p>
+            </div>
+
+            {# CTA BUTTON #}
+            <a href="{{ site_url }}/bookings/{{ booking.uid }}/" class="cta-button">
+                📄 View Your Ticket
+            </a>
+
+            {# SUPPORT #}
+            <p style="text-align: center; font-size: 12px; color: #8094ae; margin-top: 20px;">
+                Questions? <a href="mailto:support@gobus.co.zw" style="color: #6576ff; text-decoration: none;">Contact support</a>
+            </p>
+        </div>
+
+        {# FOOTER #}
+        <div class="footer">
+            <p>🚌 GoBus - Your Reliable Bus Transport Partner</p>
+            <p style="margin-top: 8px;">Booking Reference: <strong>{{ booking_reference }}</strong></p>
+            <p style="margin-top: 8px; opacity: 0.7;">Do not reply to this email. Contact us for support.</p>
+        </div>
+    </div>
+</body>
+</html>
