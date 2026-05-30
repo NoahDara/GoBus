@@ -39,6 +39,8 @@
             </a >
           </li>
 
+          {% if request.user.is_staff or request.user.is_superuser %}
+
           <li class="nk-menu-item">
             <a href="{% url "buses-index" %}" class="nk-menu-link">
               <span class="nk-menu-text">Buses</span>
@@ -68,6 +70,7 @@
               <span class="nk-menu-text">System Users</span>
             </a >
           </li>
+          {% endif %}
 
         </ul>
       </div>
